@@ -9,6 +9,7 @@ int* ask_array(int* lenptr) {
   for (int i = 0; i < *lenptr; ++i)
     if (!fscanf(fin, "%d", arr+i)) {
       free(arr);
+      fclose(fin);
       return NULL;
     }
   fclose(fin);
