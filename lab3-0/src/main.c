@@ -11,7 +11,30 @@ int* ask_array(int* lenptr) {
   return arr;
 }
 
-void sort(int* arr, int const len);
+void swap(int *a, int *b) {
+  *a ^= *b;
+  *b ^= *a;
+  *a ^= *b;
+}
+
+void sort(int* arr, int const len) {
+  if (len < 2)
+    return;
+  int const midVal = arr[len / 2];
+  int left = 0, right = len - 1;
+  while (left <= right) {
+    for (; arr[left] < midVal; ++left);
+    for (; arr[right] > midVal; --right);
+    if (left <= right) {
+      if (arr[left] > arr[right])
+        swap(arr+left, arr+right);
+      ++left;
+      --right;
+    }
+  }
+  sort(arr, right+1);
+  sort(arr + left, len - left);
+}
 
 void print_array(int* const arr, int const len) {
   FILE *fout = fopen("out.txt", "w");
@@ -23,7 +46,7 @@ void print_array(int* const arr, int const len) {
 int main(void) {
   int len;
   int* arr = ask_array(&len);
-  //sort(arr, len);
+  sort(arr, len);
   print_array(arr, len);
   free(arr);
   return EXIT_SUCCESS;
