@@ -3,8 +3,10 @@
 
 int* ask_array(int* lenptr) {
   FILE *fin = fopen("in.txt", "r");
-  if (!fscanf(fin, "%d", lenptr))
+  if (!fscanf(fin, "%d", lenptr)) {
+    fclose(fin);
     return NULL;
+  }
   int *arr = (int*)malloc(sizeof(int)*(*lenptr));
   for (int i = 0; i < *lenptr; ++i)
     if (!fscanf(fin, "%d", arr+i)) {
