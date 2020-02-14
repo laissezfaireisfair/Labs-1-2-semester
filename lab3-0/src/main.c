@@ -3,10 +3,12 @@
 
 int* ask_array(int* lenptr) {
   FILE *fin = fopen("in.txt", "r");
-  fscanf(fin, "%d", lenptr);
+  if (!fscanf(fin, "%d", lenptr))
+    return NULL;
   int *arr = (int*)malloc(sizeof(int)*(*lenptr));
   for (int i = 0; i < *lenptr; ++i)
-    fscanf(fin, "%d", arr+i);
+    if (!fscanf(fin, "%d", arr+i))
+      return NULL;
   fclose(fin);
   return arr;
 }
@@ -46,6 +48,8 @@ void print_array(int* const arr, int const len) {
 int main(void) {
   int len;
   int* arr = ask_array(&len);
+  if (arr == NULL)
+    return 1;
   sort(arr, len);
   print_array(arr, len);
   free(arr);
