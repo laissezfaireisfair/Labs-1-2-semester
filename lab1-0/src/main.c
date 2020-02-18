@@ -1,7 +1,11 @@
 #include <stdlib.h>
 #include <stdin.h>
 
-char* ask_string(FILE* fin);
+char* ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
+  char str[256];
+  fscanf(fin, "%s", &str);
+  return str;
+}
 
 int find_substr(char* const substr, char* const str, FILE* fout);
 
