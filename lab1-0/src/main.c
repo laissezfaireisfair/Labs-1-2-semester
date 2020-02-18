@@ -7,7 +7,14 @@ char* ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
   return str;
 }
 
-int find_substr(char* const substr, char* const str, FILE* fout);
+int find_substr(char* const substr, char* const str, FILE* fout) {
+  int const numOfSymbols = 256;
+  int stopTable[numOfSymbols];
+  for (int i = 0; i < numOfSymbols; ++i)
+    stopTable[i] = 0;
+  for (int i = 0; substr[i] != 0; ++i)
+    stopTable[substr[i]] = i + 1;
+}
 
 int main(void) {
   FILE* fin = fopen("in.txt", "r");
