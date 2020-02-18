@@ -12,14 +12,23 @@ int find_substr(char* const substr, char* const str, FILE* fout);
 int main(void) {
   FILE* fin = fopen("in.txt", "r");
   char *substr = ask_string(fin);
-  char *str = ask_string(fin);
-  fclose(fin);
-  if (substr == NULL || str == NULL)
+  if (substr == NULL) {
+    fclose(fin);
     return 1;
+  }
+  char *str = ask_string(fin);
+  if (str == NULL) {
+    fclose(fin);
+    free(substr);
+    return 2;
+  }
+  fclose(fin);
   FILE* fout = fopen("out.txt", "w");
   int const status = find_substr(substr, str, fout);
   fclose(fout);
+  free(substr);
+  free(str);
   if (status != 0)
-    return 2;
+    return 3;
   return 0;
 }
