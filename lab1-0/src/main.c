@@ -5,8 +5,9 @@ struct string {
   char* body;
   unsigned int length;
   unsigned int const capacity = 256;
-}
+};
 
+/// Returns pointer to stt if OK, otherwise - error code
 string ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
   string str;
   str.body = (char*)malloc(sizeof(char) * str.capacity);
@@ -18,19 +19,45 @@ string ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
       str.body[str.length] = 0;
     else {
       str.body[str.length] = symbol;
-      ++length;
+      ++str.length;
     }
   } while(symbol != '\n' && str.length < str.capacity);
   return str;
 }
 
+/// Returns 1 if substr, 0 - not substr, otherwise - error code
+int is_substr_here(string const substr, string const str, int const pos);
+
+
+/// Returns 1 if founded, 0 if not founded, otherwise - error code
 int find_substr(string const substr, string const str, FILE* fout) {
   int const numOfSymbols = 256;
+  if (substr.length > str.length)
+    return 2;
   int stopTable[numOfSymbols];
   for (int i = 0; i < numOfSymbols; ++i)
     stopTable[i] = 0;
-  for (int i = 0; substr.body[i] != 0; ++i)
-    stopTable[substr.body[i]] = i + 1;
+  for (int i = substr.length - 1; i >= 0; --i)
+    stopTable[substr.body[i]] = i;
+  for (int i = substr.length() - 1, j = substr.length - 1; i < str.length;) {
+    char const symbFromStr = str.body[i];
+    char const symbFromSubstr = substr.body[j];
+    if (symbFromStr == symbFromSubstr) {
+      const int beginPerhapsPos = i - stopTable[symbFromStr];
+      const int checkStatus = is_substr_here(substr, str, beginPerhapsPos);
+      if (checkStatus == 1)
+        return 1;
+      if (checkStatus == 0) {
+        i += substr.length;
+        j = 0;
+        continue;
+      }
+      return checkStatus;
+    }
+    else
+      j = stopTable[symbFromSubstr];
+  }
+  return 0;
 }
 
 int main(void) {
