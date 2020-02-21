@@ -55,6 +55,7 @@ int find_substr(string const substr, string const str, FILE* fout) {
   for (unsigned int i = substr.length-1, j = substr.length-1; i < str.length;) {
     unsigned char const symbFromStr = str.body[i];
     unsigned char const symbFromSubstr = substr.body[j];
+    fprintf(fout, "%d ", i + 1);
     if (symbFromStr == symbFromSubstr) {
       const int beginPerhapsPos = i - stopTable[symbFromStr];
       const int checkStatus = is_substr_here(substr, str, beginPerhapsPos);
@@ -68,7 +69,7 @@ int find_substr(string const substr, string const str, FILE* fout) {
       return checkStatus;
     }
     else
-      j = stopTable[symbFromSubstr];
+      j = stopTable[symbFromStr];
   }
   return 0;
 }
