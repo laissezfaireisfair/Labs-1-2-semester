@@ -1,8 +1,11 @@
 #include <stdlib.h>
-#include <stdin.h>
+#include <stdio.h>
+
+char const TRUE = 1;
+char const FALSE = 0;
 
 struct string {
-  char* body;
+  unsigned char* body;
   unsigned int length;
   unsigned int const capacity = 256;
 };
@@ -10,18 +13,19 @@ struct string {
 /// Returns pointer to stt if OK, otherwise - error code
 string ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
   string str;
-  str.body = (char*)malloc(sizeof(char) * str.capacity);
-  length = 0;
-  do {
+  str.body = (unsigned char*)malloc(sizeof(unsigned char) * str.capacity);
+  str.length = 0;
+  for (int strEnded = FALSE; !strEnded && str.length < str.capacity;) {
     char symbol;
     fscanf(fin, "%c", &symbol);
-    if (symbol == '\n')
+    if (symbol == '\n') {
+      strEnded = TRUE;
       str.body[str.length] = 0;
-    else {
+    } else {
       str.body[str.length] = symbol;
       ++str.length;
     }
-  } while(symbol != '\n' && str.length < str.capacity);
+  }
   return str;
 }
 
@@ -31,7 +35,7 @@ int is_substr_here(string const substr, string const str, int const pos) {
     return 2;
   if (str.length < substr.length + pos)
     return 0;
-  for (int i = 0; i < substr.length; ++i)
+  for (unsigned int i = 0; i < substr.length; ++i)
     if (substr.body[i] != str.body[i + pos])
       return 0;
   return 1;
@@ -48,9 +52,9 @@ int find_substr(string const substr, string const str, FILE* fout) {
     stopTable[i] = 0;
   for (int i = substr.length - 1; i >= 0; --i)
     stopTable[substr.body[i]] = i;
-  for (int i = substr.length() - 1, j = substr.length - 1; i < str.length;) {
-    char const symbFromStr = str.body[i];
-    char const symbFromSubstr = substr.body[j];
+  for (unsigned int i = substr.length-1, j = substr.length-1; i < str.length;) {
+    unsigned char const symbFromStr = str.body[i];
+    unsigned char const symbFromSubstr = substr.body[j];
     if (symbFromStr == symbFromSubstr) {
       const int beginPerhapsPos = i - stopTable[symbFromStr];
       const int checkStatus = is_substr_here(substr, str, beginPerhapsPos);
