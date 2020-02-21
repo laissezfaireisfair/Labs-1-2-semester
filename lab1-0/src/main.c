@@ -30,14 +30,16 @@ string ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
 }
 
 /// Returns 1 if substr, 0 - not substr, otherwise - error code
-int is_substr_here(string const substr, string const str, int const pos) {
+int is_substr_here(string const substr, string const str, int const pos, FILE* fout) {
   if (str.length == 0 || substr.length == 0)
     return 2;
   if (str.length < substr.length + pos)
     return 0;
-  for (unsigned int i = 0; i < substr.length; ++i)
+  for (unsigned int i = 0; i < substr.length; ++i) {
+    fprintf(fout, "%d ", i + pos + 1);
     if (substr.body[i] != str.body[i + pos])
       return 0;
+  }
   return 1;
 }
 
@@ -58,7 +60,7 @@ int find_substr(string const substr, string const str, FILE* fout) {
     fprintf(fout, "%d ", i + 1);
     if (symbFromStr == symbFromSubstr) {
       const int beginPerhapsPos = i - stopTable[symbFromStr];
-      const int checkStatus = is_substr_here(substr, str, beginPerhapsPos);
+      const int checkStatus = is_substr_here(substr, str, beginPerhapsPos, fout);
       if (checkStatus == 1)
         return 1;
       if (checkStatus == 0) {
@@ -98,7 +100,7 @@ int main(void) {
   fclose(fout);
   free(substr.body);
   free(str.body);
-  if (status != 0)
+  if (status != 1)
     return 3;
   return 0;
 }
