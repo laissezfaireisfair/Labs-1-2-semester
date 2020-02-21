@@ -26,7 +26,16 @@ string ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
 }
 
 /// Returns 1 if substr, 0 - not substr, otherwise - error code
-int is_substr_here(string const substr, string const str, int const pos);
+int is_substr_here(string const substr, string const str, int const pos) {
+  if (str.length == 0 || substr.length == 0)
+    return 2;
+  if (str.length < substr.length + pos)
+    return 0;
+  for (int i = 0; i < substr.length; ++i)
+    if (substr.body[i] != str.body[i + pos])
+      return 0;
+  return 1;
+}
 
 
 /// Returns 1 if founded, 0 if not founded, otherwise - error code
