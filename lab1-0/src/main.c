@@ -49,7 +49,7 @@ int find_substr(string const substr, string const str, FILE* fout) {
     return 2;
   int stopTable[numOfSymbols];
   for (int i = 0; i < numOfSymbols; ++i)
-    stopTable[i] = 0;
+    stopTable[i] = -1;
   for (int i = substr.length - 1; i >= 0; --i)
     stopTable[substr.body[i]] = i;
   for (unsigned int i = substr.length-1, j = substr.length-1; i < str.length;) {
@@ -69,7 +69,12 @@ int find_substr(string const substr, string const str, FILE* fout) {
       return checkStatus;
     }
     else
-      j = stopTable[symbFromStr];
+      if (stopTable[symbFromStr] != -1)
+        j = stopTable[symbFromStr];
+      else {
+        i += substr.length;
+        j = 0;
+      }
   }
   return 0;
 }
