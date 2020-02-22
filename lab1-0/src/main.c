@@ -54,7 +54,7 @@ int find_substr(String const substr, String const str, FILE* fout) {
   int stopTable[numOfSymbols];
   for (int i = 0; i < numOfSymbols; ++i)
     stopTable[i] = -1;
-  for (int i = substr.length - 1; i >= 0; --i)
+  for (int i = 0; i < substr.length; ++i)
     stopTable[substr.body[i]] = i;
   for (unsigned int i = substr.length-1, j = substr.length-1; i < str.length;) {
     unsigned char const symbFromStr = str.body[i];
@@ -66,7 +66,7 @@ int find_substr(String const substr, String const str, FILE* fout) {
       if (checkStatus == 1)
         return 1;
       if (checkStatus == 0) {
-        i += substr.length;
+        i += substr.length - 1;
         j = 0;
         continue;
       }
