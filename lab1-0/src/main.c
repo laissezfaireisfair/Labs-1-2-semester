@@ -3,16 +3,18 @@
 
 char const TRUE = 1;
 char const FALSE = 0;
+unsigned int const STR_CAPACITY = 256;
 
-struct string {
+typedef struct _String {
   unsigned char* body;
   unsigned int length;
-  unsigned int const capacity = 256;
-};
+  unsigned int capacity;
+} String;
 
 /// Returns pointer to stt if OK, otherwise - error code
-string ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
-  string str;
+String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
+  String str;
+  str.capacity = STR_CAPACITY;
   str.body = (unsigned char*)malloc(sizeof(unsigned char) * str.capacity);
   str.length = 0;
   for (int strEnded = FALSE; !strEnded && str.length < str.capacity;) {
@@ -30,12 +32,12 @@ string ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
 }
 
 /// Returns 1 if substr, 0 - not substr, otherwise - error code
-int is_substr_here(string const substr, string const str, int const pos, FILE* fout) {
+int is_substr_here(String const substr, String const str, int const pos, FILE* fout) {
   if (str.length == 0 || substr.length == 0)
     return 2;
   if (str.length < substr.length + pos)
     return 0;
-  for (unsigned int i = 0; i < substr.length; ++i) {
+  for (int i = substr.length - 1; i >= 0; --i) {
     fprintf(fout, "%d ", i + pos + 1);
     if (substr.body[i] != str.body[i + pos])
       return 0;
@@ -45,7 +47,7 @@ int is_substr_here(string const substr, string const str, int const pos, FILE* f
 
 
 /// Returns 1 if founded, 0 if not founded, otherwise - error code
-int find_substr(string const substr, string const str, FILE* fout) {
+int find_substr(String const substr, String const str, FILE* fout) {
   int const numOfSymbols = 256;
   if (substr.length > str.length)
     return 2;
@@ -83,12 +85,12 @@ int find_substr(string const substr, string const str, FILE* fout) {
 
 int main(void) {
   FILE* fin = fopen("in.txt", "r");
-  string substr = ask_string(fin);
+  String substr = ask_String(fin);
   if (substr.body == NULL) {
     fclose(fin);
     return 1;
   }
-  string str = ask_string(fin);
+  String str = ask_String(fin);
   if (str.body == NULL) {
     fclose(fin);
     free(substr.body);
