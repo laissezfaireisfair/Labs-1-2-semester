@@ -31,6 +31,13 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 	return output;
 }
 
+/// Считает количество символов в строке
+unsigned int len(char const *str) {
+	unsigned int len;
+	for (len = 0; str[len] != 0; ++len);
+	return len + 1;
+}
+
 	/// Переводит число в десятичную систему счисления
 	double to10sys(int *Input,int sys1,int n, int m)
 	{
@@ -159,16 +166,6 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 		return maxSys+1;
 	}
 
-	/// Считает количество символов в строке
-	int counter(char *In1)
-	{
-		int n1 = 0, i = 0;
-		do{
-		n1++;
-		i++;
-		}while(*(In1+i) != 0);
-		return n1;
-	}
 int main()
 {
 	// Инициализация переменных
