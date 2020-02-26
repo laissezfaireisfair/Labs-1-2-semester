@@ -9,7 +9,7 @@ unsigned int const INPUT_MAX_LEN = 13;
 enum errors {OK, DIVISION_BY_ZERO, NULL_POINTER, INVALID_ARGUMENT};
 typedef enum errors error;
 
-/// Функция разворачивающая первые n элементов массива
+/// Разворачивает первые несколько элементов массива
 error reverse(int *arr, unsigned int const lenToReverse) {
 	if (arr == NULL)
 		return NULL_POINTER;
@@ -21,7 +21,7 @@ error reverse(int *arr, unsigned int const lenToReverse) {
 	return OK;
 }
 
-/// Функция вычисляющая base в степени exponent
+/// Вычисляет base в степени exponent
 unsigned double pow(unsigned int const base, unsigned int const exponent) {
 	unsigned double output = 1.;
 	if (exponent > 0)
@@ -31,7 +31,7 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 	return output;
 }
 
-	///функция перевода в десятичную, возвращает число в десятичной
+	/// Переводит число в десятичную систему счисления
 	double to10sys(int *Input,int sys1,int n, int m)
 	{
 		double prom10 = 0;
@@ -43,7 +43,7 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 		return prom10;
 	}
 
-	///функция перевода целого числа в нужную систему счисления, возвращает количество символов в новой системе
+	/// Переводит из десятичной системы счисления, возвращает длину
 	int toOtherSys(long long int prom10,int sys2,int *Out)
 	{
 		int counter = 0;
@@ -63,7 +63,7 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 		return counter;
 	}
 
-	///Функция для перевода дробной части из 10 в любую систему счисления
+	/// Переводит дробную часть числа из десятичной системы
 	int toOtherSysDrob(double prom10, int sys2, int *Out)
 	{
 		int i,  celoe = 0, symbols = 0;
@@ -80,7 +80,7 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 	}
 
 
-	///функция для перевода из массива интов в массив чаров (цифры до 15)
+	/// Переводит массив чисел в строку
 	void intToChar(int *in, int n, int m, char *out, int *flag)
 	{
 		int i;
@@ -100,7 +100,7 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 			for (i=n;i<n+m && *flag == TRUE;i++)
 				{
 					if(in[i] >= 0 && in[i] <= 9)
-						out[i+1] = in[i] + '0'; /// здесь и далее в функции i+1 так как сдвиг не 1 из-за точки занимающей место в массиве
+						out[i+1] = in[i] + '0';
 					else
 						if(in[i] >= 10 && in[i] <= 35)
 							out[i+1] = in[i]-10+'a';
@@ -110,7 +110,7 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 		}
 	}
 
-	///функция для преобразования char[] -> int[]
+	/// Преобразует строку в массив чисел
 	int charToInt(char *in, int *out, int num, int *flag, int *n, int *m)
 	{
 		int *drobnost, sdvigOut = 0, maxSys = 1, i, charAfterPoint = 0;
@@ -159,7 +159,7 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 		return maxSys+1;
 	}
 
-	///функция для подсчётa количества символов в строке
+	/// Считает количество символов в строке
 	int counter(char *In1)
 	{
 		int n1 = 0, i = 0;
@@ -171,19 +171,19 @@ unsigned double pow(unsigned int const base, unsigned int const exponent) {
 	}
 int main()
 {
-	///инициализация переменных
+	// Инициализация переменных
 	char inAndOut[INPUT_MAX_LEN];
 	int maxSys, i, n = 0, m = 0, flag = TRUE, num1, sys1, sys2, chislo[INPUT_MAX_LEN + 1];
 	double promIn10;
 			long long int prom10Cel;
 
-	///открытие файлов
+	// Открытие файлов
 	FILE *fin;
 	FILE *fout;
 	fin = fopen("in.txt","r");
 	fout = fopen("out.txt","w");
 
-	///получение входных данных
+	// Получение входных данных
 	fscanf(fin,"%d %d", &sys1, &sys2);
 	if(sys1>MAX_SYSTEM || sys1<MIN_SYSTEM || sys2>MAX_SYSTEM ||sys2<MIN_SYSTEM)
 	{
@@ -194,7 +194,7 @@ int main()
 	fscanf(fin, "%s", inAndOut);
 
 
-	///преобразование в массив целых
+	// Преобразование в массив целых
 	num1 = counter(inAndOut);
 	maxSys = charToInt(inAndOut, chislo, num1, &flag, &n, &m);
 	if(maxSys>sys1)
@@ -203,19 +203,19 @@ int main()
 		fprintf(fout, "bad input");
 		return 2;
 	}
-	///получение промежуточного числа в десятичной системе счисления
+	// Получение промежуточного числа в десятичной системе счисления
 	promIn10 = to10sys(chislo, sys1, n, m);
 
 	if(sys2 != 10)
 	{
-		///получение числа в нужной системе
+		// Получение числа в нужной системе
 		prom10Cel = promIn10;
 		promIn10 -= prom10Cel;
 		n = toOtherSys(prom10Cel, sys2, &chislo[0]);
 		revers(chislo, n);
 		m = toOtherSysDrob(promIn10, sys2, &chislo[0]+n);
 
-		///вывод результата
+		// Вывод результата
 		intToChar(chislo, n, m, inAndOut, &flag);
 		if(flag == FALSE)
 		{
@@ -236,7 +236,7 @@ int main()
 	{
 		fprintf(fout, "%f", promIn10);
 	}
-	///закрытие файлов
+	// Закрытие файлов
 	fclose(fin);
 	fclose(fout);
 	return 0;
