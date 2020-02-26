@@ -6,7 +6,7 @@ unsigned int const MAX_BASE      = 16;
 unsigned int const MIN_BASE      = 2;
 unsigned int const INPUT_MAX_LEN = 13;
 
-enum errors {OK, DIVISION_BY_ZERO, NULL_POINTER, INVALID_ARGUMENT};
+enum errors {OK, DIVISION_BY_ZERO, NULL_POINTER, INVALID_ARGUMENT, BAD_INPUT};
 typedef enum errors error;
 
 /// Разворачивает первые несколько элементов массива
