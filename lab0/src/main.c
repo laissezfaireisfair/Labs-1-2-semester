@@ -21,19 +21,15 @@ error reverse(int *arr, unsigned int const lenToReverse) {
 	return OK;
 }
 
-	///функция вычисляющая a в степени b
-	double stepen(int a, int b)
-	{
-		int i;
-		double output = 1;
-		if(b>=0)
-			for(i=1;i<=b;i++)
-			 	output *= a;
-		else
-			for(i=-1;i>=b;i--)
-			 	output /= a;
-		return output;
-	}
+/// Функция вычисляющая base в степени exponent
+unsigned double pow(unsigned int const base, unsigned int const exponent) {
+	unsigned double output = 1.;
+	if (exponent > 0)
+		for (unsigned int i = 0; i < exponent; ++i, output *= base);
+	else
+		for (unsigned int i = 0; i > exponent; --i, output /= base);
+	return output;
+}
 
 	///функция перевода в десятичную, возвращает число в десятичной
 	double to10sys(int *Input,int sys1,int n, int m)
