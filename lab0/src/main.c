@@ -6,17 +6,20 @@ unsigned int const MAX_BASE      = 16;
 unsigned int const MIN_BASE      = 2;
 unsigned int const INPUT_MAX_LEN = 13;
 
-	///функция переворачивающая первые n элементов массива
-	void revers(int a[],int n)
-	{
-		int i;
-		for(i=0; i<(n/2); i++)
-		{
-			a[i] ^= a[n-i-1];
-			a[n-i-1] ^= a[i];
-			a[i] ^= a[n-i-1];
-		}
+enum errors {OK, DIVISION_BY_ZERO, NULL_POINTER, INVALID_ARGUMENT};
+typedef enum errors error;
+
+/// Функция разворачивающая первые n элементов массива
+error reverse(int *arr, unsigned int const lenToReverse) {
+	if (arr == NULL)
+		return NULL_POINTER;
+	for (unsigned int i = 0; i < lenToReverse / 2; ++i) {
+		arr[i]     ^= arr[n-i-1];
+		arr[n-i-1] ^= arr[i];
+		arr[i]     ^= arr[n-i-1];
 	}
+	return OK;
+}
 
 	///функция вычисляющая a в степени b
 	double stepen(int a, int b)
