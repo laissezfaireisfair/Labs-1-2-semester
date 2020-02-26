@@ -1,11 +1,10 @@
 #include <stdio.h>
 
-#define SYMBOLS_MAX 50
-#define IN_BUFER_MAX (SYMBOLS_MAX-2) /// минус два так как запятая и ноль в конце
-#define TRUEC 1
-#define FALSEC 0
-#define MAX_SYSTEM 16
-#define MIN_SYSTEM 2
+int const          TRUE          = 1;
+int const          FALSE         = 0;
+unsigned int const MAX_BASE      = 16;
+unsigned int const MIN_BASE      = 2;
+unsigned int const INPUT_MAX_LEN = 13;
 
 	///функция переворачивающая первые n элементов массива
 	void revers(int a[],int n)
@@ -86,7 +85,7 @@
 	void intToChar(int *in, int n, int m, char *out, int *flag)
 	{
 		int i;
-		for (i=0;i<n && *flag == TRUEC;i++)
+		for (i=0;i<n && *flag == TRUE;i++)
 			{
 				if(in[i] >= 0 && in[i] <= 9)
 					out[i] = in[i] + '0';
@@ -94,12 +93,12 @@
 					if(in[i] >= 10 && in[i] <= 35)
 						out[i] = in[i]-10+'a';
 					else
-						*flag = FALSEC;
+						*flag = FALSE;
 			}
-		if(*flag == TRUEC && m != 0)
+		if(*flag == TRUE && m != 0)
 		{
 			out[n] = '.';
-			for (i=n;i<n+m && *flag == TRUEC;i++)
+			for (i=n;i<n+m && *flag == TRUE;i++)
 				{
 					if(in[i] >= 0 && in[i] <= 9)
 						out[i+1] = in[i] + '0'; /// здесь и далее в функции i+1 так как сдвиг не 1 из-за точки занимающей место в массиве
@@ -107,7 +106,7 @@
 						if(in[i] >= 10 && in[i] <= 35)
 							out[i+1] = in[i]-10+'a';
 						else
-							*flag = FALSEC;
+							*flag = FALSE;
 				}
 		}
 	}
@@ -117,7 +116,7 @@
 	{
 		int *drobnost, sdvigOut = 0, maxSys = 1, i, charAfterPoint = 0;
 		drobnost = n;
-		for(i=0;i<num && *flag==TRUEC && charAfterPoint < 6;i++)
+		for(i=0;i<num && *flag==TRUE && charAfterPoint < 6;i++)
 		{
 			if(in[i] == '.' || in[i] == ',')
 			{
@@ -125,7 +124,7 @@
 				if(sdvigOut == 0)
 					sdvigOut++;
 				else
-					*flag = FALSEC;
+					*flag = FALSE;
 			}
 			else
 			   {
@@ -150,14 +149,14 @@
 			    		        charAfterPoint++;
 			    		}
 			    		else
-			    			*flag = FALSEC;
+			    			*flag = FALSE;
 			    	}
 			   }
 		}
 		if(drobnost == m && *m == 0)
-		    *flag = FALSEC;
+		    *flag = FALSE;
 		if(drobnost == m && *n == 0)
-		    *flag = FALSEC;
+		    *flag = FALSE;
 		return maxSys+1;
 	}
 
@@ -174,8 +173,8 @@
 int main()
 {
 	///инициализация переменных
-	char inAndOut[SYMBOLS_MAX];
-	int maxSys, i, n = 0, m = 0, flag = TRUEC, num1, sys1, sys2, chislo[IN_BUFER_MAX];
+	char inAndOut[INPUT_MAX_LEN];
+	int maxSys, i, n = 0, m = 0, flag = TRUE, num1, sys1, sys2, chislo[INPUT_MAX_LEN + 1];
 	double promIn10;
 			long long int prom10Cel;
 
@@ -189,7 +188,7 @@ int main()
 	fscanf(fin,"%d %d", &sys1, &sys2);
 	if(sys1>MAX_SYSTEM || sys1<MIN_SYSTEM || sys2>MAX_SYSTEM ||sys2<MIN_SYSTEM)
 	{
-		flag = FALSEC;
+		flag = FALSE;
 		fprintf(fout, "bad input");
 	     	return 1;
 	}
@@ -201,7 +200,7 @@ int main()
 	maxSys = charToInt(inAndOut, chislo, num1, &flag, &n, &m);
 	if(maxSys>sys1)
 	{
-		flag == FALSEC;
+		flag == FALSE;
 		fprintf(fout, "bad input");
 		return 2;
 	}
@@ -219,7 +218,7 @@ int main()
 
 		///вывод результата
 		intToChar(chislo, n, m, inAndOut, &flag);
-		if(flag == FALSEC)
+		if(flag == FALSE)
 		{
 			fprintf(fout, "bad input");
 			return 3;
