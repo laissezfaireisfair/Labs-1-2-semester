@@ -20,16 +20,15 @@ typedef struct _Num {
   unsigned int  lenFrac;
 } Num;
 
-error init_num(Num *num) {
-	if (num == NULL)
-		return NULL_POINTER;
-	num->base     = 0;
-	num->negative = FALSE;
-	num->bodyInt  = NULL;
-	num->lenInt   = 0;
-	num->bodyFrac = NULL;
-	num->lenFrac  = 0;
-	return OK;
+Num make_num() {
+	Num num;
+	num.base     = 0;
+	num.negative = FALSE;
+	num.bodyInt  = NULL;
+	num.lenInt   = 0;
+	num.bodyFrac = NULL;
+	num.lenFrac  = 0;
+	return num;
 }
 
 error delete_num(Num *num) {
@@ -40,6 +39,7 @@ error delete_num(Num *num) {
 	return OK;
 }
 
+/// String should be like "0.1" or "-0.1" where 0 is less significant digit
 error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	if (str == NULL || num == NULL)
 		return NULL_POINTER;
@@ -57,27 +57,9 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	} else
 		num->negative = FALSE;
 
-	// Get integer part of num:
-	num->lenInt = 0;
-	for (unsigned int j = 0; str[i] != 0 && str[i] != '.'; ++i, ++j) {
-		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1)
-			return LENGTH_ERROR;
-		if (str[i] < '0' || str[i] > '0' + base - 1)
-			return INVALID_ARGUMENT;
-		num->bodyInt[j] = str[i] - '0';
-		num->lenInt = j + 1;
-	}
-
-	if (num->lenInt == 0)
-		return INVALID_ARGUMENT;
-	if (str[i] == 0)
-		return OK;
-	if (i == INPUT_MAX_LEN - 2 && str[i] == '.') // Point as last symbol
-		return INVALID_ARGUMENT;
-
 	// Get fraction part of num:
-	i += 1; // Skip symbol of point
-	for (unsigned int j = 0; str[i] != 0; ++i, ++j) {
+	num->lenFrac = 0;
+	for (unsigned int j = 0; str[i] != 0 && str[i] != '.'; ++i, ++j) {
 		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1)
 			return LENGTH_ERROR;
 		if (str[i] < '0' || str[i] > '0' + base - 1)
@@ -87,6 +69,24 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	}
 
 	if (num->lenFrac == 0)
+		return INVALID_ARGUMENT;
+	if (str[i] == 0)
+		return OK;
+	if (i == INPUT_MAX_LEN - 2 && str[i] == '.') // Point as last symbol
+		return INVALID_ARGUMENT;
+
+	// Get integer part of num:
+	i += 1; // Skip symbol of point
+	for (unsigned int j = 0; str[i] != 0; ++i, ++j) {
+		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1)
+			return LENGTH_ERROR;
+		if (str[i] < '0' || str[i] > '0' + base - 1)
+			return INVALID_ARGUMENT;
+		num->bodyInt[j] = str[i] - '0';
+		num->lenInt = j + 1;
+	}
+
+	if (num->lenInt == 0)
 		return INVALID_ARGUMENT;
 
 	return OK;
