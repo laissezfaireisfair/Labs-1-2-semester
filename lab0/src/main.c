@@ -62,34 +62,55 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	// Get fraction part of num:
 	num->lenFrac = 0;
 	for (unsigned int j = 0; str[i] != 0 && str[i] != '.'; ++i, ++j) {
-		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1)
+		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1) {
+			free(num->bodyInt);
+			free(num->bodyFrac);
 			return LENGTH_ERROR;
-		if (str[i] < '0' || str[i] > '0' + base - 1)
+		}
+		if (str[i] < '0' || str[i] > '0' + base - 1) {
+			free(num->bodyInt);
+			free(num->bodyFrac);
 			return INVALID_ARGUMENT;
+		}
 		num->bodyFrac[j] = str[i] - '0';
 		num->lenFrac = j + 1;
 	}
 
-	if (num->lenFrac == 0)
+	if (num->lenFrac == 0) {
+		free(num->bodyInt);
+		free(num->bodyFrac);
 		return INVALID_ARGUMENT;
+	}
 	if (str[i] == 0)
 		return OK;
-	if (i == INPUT_MAX_LEN - 2 && str[i] == '.') // Point as last symbol
+	if (i == INPUT_MAX_LEN - 2 && str[i] == '.') { // Point as last symbol
+		free(num->bodyInt);
+		free(num->bodyFrac);
 		return INVALID_ARGUMENT;
+	}
 
 	// Get integer part of num:
 	i += 1; // Skip symbol of point
 	for (unsigned int j = 0; str[i] != 0; ++i, ++j) {
-		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1)
+		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1) {
+			free(num->bodyInt);
+			free(num->bodyFrac);
 			return LENGTH_ERROR;
-		if (str[i] < '0' || str[i] > '0' + base - 1)
+		}
+		if (str[i] < '0' || str[i] > '0' + base - 1) {
+			free(num->bodyInt);
+			free(num->bodyFrac);
 			return INVALID_ARGUMENT;
+		}
 		num->bodyInt[j] = str[i] - '0';
 		num->lenInt = j + 1;
 	}
 
-	if (num->lenInt == 0)
+	if (num->lenInt == 0) {
+		free(num->bodyInt);
+		free(num->bodyFrac);
 		return INVALID_ARGUMENT;
+	}
 
 	return OK;
 }
