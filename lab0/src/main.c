@@ -108,6 +108,50 @@ error num_to_dec(Num const *num, double *out) {
 	return OK;
 }
 
+error read(unsigned int *bI, unsigned int *bO, char *str)	{
+	if (bI == NULL || bO == NULL || str == NULL)
+		return NULL_POINTER;
+
+	FILE *fin = fopen(INPUT_FILE_NAME, "r");
+
+	int const baseReadStatus = fscanf(fin, "%u %u\n", bI, bO);
+
+	if (baseReadStatus == EOF || baseReadStatus == 0)
+		return BAD_INPUT;
+
+	int pointPassed = FALSE;
+
+	for (unsigned int i = 0; i < INPUT_MAX_LEN; ++i) {
+		char symbol;
+		int symbolReadStatus = fscanf(fin, "%c", &symbol);
+		if (symbolReadStatus == 0)
+			return BAD_INPUT;
+		if (symbolReadStatus == EOF) {
+			if (i == 0)
+				return BAD_INPUT;
+			else
+				break;
+		}
+		if (symbol == '-' && i == 0) {
+			str[i] = symbol;
+			continue;
+		}
+		if (symbol == '.') {
+			if (pointPassed == FALSE) {
+				pointPassed = TRUE;
+				continue;
+			}
+			return BAD_INPUT;
+		}
+		if (symbol < '0' || symbol > '0' + *bI - 1)
+				return BAD_INPUT;
+		str[i] = symbol;
+	}
+
+	fclose(fin);
+	return OK;
+}
+
 int main() {
 	return OK;
 }
