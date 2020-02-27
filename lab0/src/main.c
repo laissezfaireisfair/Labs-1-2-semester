@@ -174,5 +174,27 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 }
 
 int main() {
+	unsigned int base1, base2;
+	char str[INPUT_MAX_LEN];
+
+	error readStatus = read(&base1, &base2, str);
+	if (readStatus != OK)
+		return readStatus;
+	printf("Reading passed.\n");
+
+	Num num = make_num();
+
+	error initStatus = init_num_with_str(str, base1, &num);
+	if (initStatus != OK)
+		return initStatus;
+	printf("Initialisation passed.\n");
+
+	double decNumber;
+
+	error conversionStatus = num_to_dec(&num, &decNumber);
+	if (conversionStatus != OK)
+		return conversionStatus;
+	printf("Conversion passed. number = %f\n", decNumber);
+
 	return OK;
 }
