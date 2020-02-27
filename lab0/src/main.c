@@ -92,6 +92,20 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	return OK;
 }
 
+error num_to_dec(Num const *num, double *out) {
+	if (num == NULL || out == NULL)
+		return NULL_POINTER;
+	if (num->base == 0) // Test for uninitialised Num
+		return INVALID_ARGUMENT;
+	*out = 0.;
+	double j = 1. / num->base;
+	for (unsigned int i = 0; i < num->lenFrac; ++i, j /= num->base)
+		*out += num->bodyFrac[i] * j;
+	for (unsigned int i = 0, k = num->base; i < num->lenInt; ++i, k *= num->base)
+		*out += num->bodyFrac[i] * k;
+	return OK;
+}
+
 int main() {
 	return OK;
 }
