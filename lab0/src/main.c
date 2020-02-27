@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int const          TRUE          = 1;
-int const          FALSE         = 0;
-unsigned int const MAX_BASE      = 16;
-unsigned int const MIN_BASE      = 2;
-unsigned int const INPUT_MAX_LEN = 13;
+int const          TRUE             = 1;
+int const          FALSE            = 0;
+unsigned int const MAX_BASE         = 16;
+unsigned int const MIN_BASE         = 2;
+unsigned int const INPUT_MAX_LEN    = 13;
+char const * const INPUT_FILE_NAME  = "in.txt";
+char const * const OUTPUT_FILE_NAME = "out.txt";
 
 enum errors {OK, DIVISION_BY_ZERO, NULL_POINTER, INVALID_ARGUMENT, BAD_INPUT,
 	 						RUNTIME_ERROR, LENGTH_ERROR};
