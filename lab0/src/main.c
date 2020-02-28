@@ -195,6 +195,14 @@ int main() {
 		return readStatus;
 	printf("Reading passed.\n");
 
+	int isNegative = str[0] == '-' ? TRUE : FALSE;
+	char *beginOfDigits = isNegative ? str + 1 : str;
+
+	error revertStatus = revert_str(beginOfDigits);
+	if (revertStatus != OK)
+		return revertStatus;
+	printf("Reverting passed.\n");
+
 	Num num = make_num();
 
 	error initStatus = init_num_with_str(str, base1, &num);
