@@ -173,6 +173,19 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 	return OK;
 }
 
+error revert_str(char *str) {
+	if (str == NULL)
+		return NULL_POINTER;
+	unsigned int length = 1;
+	for (;str[length - 1] != 0; ++length);
+	for (unsigned int i = 0; i < length / 2; ++i) {
+		char temp = str[i];
+		str[i] = str[length - i - 1];
+		str[length - i - 1] = temp;
+	}
+	return OK;
+}
+
 int main() {
 	unsigned int base1, base2;
 	char str[INPUT_MAX_LEN];
