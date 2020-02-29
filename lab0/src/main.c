@@ -76,11 +76,6 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 		num->lenFrac = j + 1;
 	}
 
-	if (num->lenFrac == 0) {
-		free(num->bodyInt);
-		free(num->bodyFrac);
-		return INVALID_ARGUMENT;
-	}
 	if (str[i] == 0)
 		return OK;
 	if (i == INPUT_MAX_LEN - 2 && str[i] == '.') { // Point as last symbol
@@ -106,7 +101,7 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 		num->lenInt = j + 1;
 	}
 
-	if (num->lenInt == 0) {
+	if (num->lenInt == 0 && num->lenFrac == 0) {
 		free(num->bodyInt);
 		free(num->bodyFrac);
 		return INVALID_ARGUMENT;
@@ -122,9 +117,9 @@ error num_to_dec(Num const *num, double *out) {
 		return INVALID_ARGUMENT;
 	*out = 0.;
 	double j = 1. / num->base;
-	for (unsigned int i = 0; i < num->lenFrac; ++i, j /= num->base)
-		*out += num->bodyFrac[i] * j;
-	for (unsigned int i = 0, k = num->base; i < num->lenInt; ++i, k *= num->base)
+	for (int i = num->lenFrac - 1; i >= 0; --i, j /= num->base)
+		*out += num->bodyFrac[(unsigned int)i] * j;
+	for (unsigned int i = 0, k = 1; i < num->lenInt; ++i, k *= num->base)
 		*out += num->bodyFrac[i] * k;
 	return OK;
 }
@@ -147,11 +142,13 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 		int symbolReadStatus = fscanf(fin, "%c", &symbol);
 		if (symbolReadStatus == 0)
 			return BAD_INPUT;
-		if (symbolReadStatus == EOF) {
+		if (symbolReadStatus == EOF || symbol == '\n') {
 			if (i == 0)
 				return BAD_INPUT;
-			else
+			else {
+				str[i] = 0;
 				break;
+			}
 		}
 		if (symbol == '-' && i == 0) {
 			str[i] = symbol;
@@ -160,6 +157,7 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 		if (symbol == '.') {
 			if (pointPassed == FALSE) {
 				pointPassed = TRUE;
+				str[i] = symbol;
 				continue;
 			}
 			return BAD_INPUT;
@@ -180,8 +178,8 @@ error revert_str(char *str) {
 	for (;str[length - 1] != 0; ++length);
 	for (unsigned int i = 0; i < length / 2; ++i) {
 		char temp = str[i];
-		str[i] = str[length - i - 1];
-		str[length - i - 1] = temp;
+		str[i] = str[length - i - 2];
+		str[length - i - 2] = temp;
 	}
 	return OK;
 }
