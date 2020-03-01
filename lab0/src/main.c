@@ -153,16 +153,16 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	return OK;
 }
 
-error num_to_dec(Num const *num, double *out) {
+error num_to_dec(Num const *num, long double *out) {
 	if (num == NULL || out == NULL)
 		return NULL_POINTER;
 	if (num->base == 0) // Test for uninitialised Num
 		return INVALID_ARGUMENT;
 	*out = 0.;
-	double j = 1. / num->base;
-	for (int i = num->lenFrac - 1; i >= 0; --i, j /= num->base)
-		*out += num->bodyFrac[(unsigned int)i] * j;
-	for (unsigned int i = 0, k = 1; i < num->lenInt; ++i, k *= num->base)
+	long double j = 1. / num->base;
+	for (unsigned long long int i = 0; i < num->lenFrac; ++i, j /= num->base)
+		*out += num->bodyFrac[(unsigned int)(num->lenFrac - i - 1)] * j;
+	for (unsigned long long int i = 0, k = 1; i < num->lenInt; ++i, k *= num->base)
 		*out += num->bodyInt[i] * k;
 	if (num->negative)
 		*out *= -1.;
@@ -238,16 +238,16 @@ error revert_str(char *str) {
 }
 
 /// Positive only
-double integer_part(double const num) {
+long double integer_part(long double const num) {
 	if (num < 0) {
 		printf("integer_part(): Range error.\n");
 		exit(INVALID_ARGUMENT);
 	}
-	return (double)(unsigned int)num;
+	return (long double)(unsigned long long int)num;
 }
 
 /// Positive only
-double fraction_part(double const num) {
+long double fraction_part(long double const num) {
 	if (num < 0) {
 		printf("fraction_part(): Range error.\n");
 		exit(INVALID_ARGUMENT);
@@ -255,7 +255,7 @@ double fraction_part(double const num) {
 	return num - integer_part(num);
 }
 
-error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
+error init_num_with_dec(long double const dec, unsigned int const base, Num *out) {
 	if (out == NULL)
 		return NULL_POINTER;
 	if (base < MIN_BASE || base > MAX_BASE)
@@ -275,14 +275,14 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 	}
 
 	out->negative = (dec < 0) ? TRUE : FALSE;
-	double const decPositive = (out->negative) ? dec * -1. : dec;
+	long double const decPositive = (out->negative) ? dec * -1. : dec;
 
 	// Convert integer part
 	out->bodyInt = (char*)malloc(sizeof(char) * RESULT_MAX_LEN);
 	if (out->bodyInt == NULL)
 		return RUNTIME_ERROR;
 	out->lenInt = 0;
-	for (unsigned int i = decPositive; i > 0; i /= base)
+	for (unsigned long long int i = decPositive; i > 0; i /= base)
 		out->bodyInt[out->lenInt++] = i % base;
 
 	// Convert fraction part (warning: result is reverted)
@@ -291,8 +291,8 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 		return RUNTIME_ERROR;
 	}
 	out->lenFrac = 0;
-	double const decPositiveFrac = fraction_part(decPositive);
-	for (double i = decPositiveFrac; i > 0; i *= base, i -= integer_part(i)) {
+	long double const decPositiveFrac = fraction_part(decPositive);
+	for (long double i = decPositiveFrac; i > 0; i *= base, i -= integer_part(i)) {
 		out->bodyFrac[out->lenFrac++] = (unsigned int)(i * base);
 		if (out->lenFrac == FRAC_OUT_MAX_LEN)
 			break;
@@ -390,7 +390,7 @@ int main() {
 
 	Num numConversed = make_num();
 	if (base1 != base2) {
-		double decNumber;
+		long double decNumber;
 		error const decShowStatus = num_to_dec(&num, &decNumber);
 		if (decShowStatus != OK) {
 			print_error();
