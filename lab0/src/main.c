@@ -121,6 +121,8 @@ error num_to_dec(Num const *num, double *out) {
 		*out += num->bodyFrac[(unsigned int)i] * j;
 	for (unsigned int i = 0, k = 1; i < num->lenInt; ++i, k *= num->base)
 		*out += num->bodyFrac[i] * k;
+	if (num->negative)
+		*out *= -1.;
 	return OK;
 }
 
@@ -181,6 +183,68 @@ error revert_str(char *str) {
 		str[i] = str[length - i - 2];
 		str[length - i - 2] = temp;
 	}
+	return OK;
+}
+
+/// Positive only
+double integer_part(double const num) {
+	if (num < 0) {
+		printf("integer_part(): Range error.\n");
+		exit(INVALID_ARGUMENT);
+	}
+	return (double)(unsigned int)num;
+}
+
+/// Positive only
+double fraction_part(double const num) {
+	if (num < 0) {
+		printf("fraction_part(): Range error.\n");
+		exit(INVALID_ARGUMENT);
+	}
+	return num - integer_part(num);
+}
+
+error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
+	if (out == NULL)
+		return NULL_POINTER;
+	if (base < MIN_BASE || base > MAX_BASE)
+		return INVALID_ARGUMENT;
+
+	out->base = base;
+
+	if (dec == 0) {
+		out->lenInt = 1;
+		out->bodyInt = (unsigned int*)malloc(sizeof(unsigned int));
+		out->bodyInt[0] = 0;
+		out->lenFrac = 0;
+		out->bodyFrac = NULL;
+		return OK;
+	}
+
+	out->negative = (dec < 0) ? TRUE : FALSE;
+	double const decPositive = (out->negative) ? dec * -1. : dec;
+
+	// Convert integer part
+	out->bodyInt = (unsigned int*)malloc(sizeof(unsigned int) * INPUT_MAX_LEN);
+	out->lenInt = 0;
+	for (unsigned int i = decPositive; i >= 0; i /= base)
+		out->bodyInt[out->lenInt++] = i % base;
+
+	// Convert fraction part (warning: result is reverted)
+	out->bodyFrac = (unsigned int*)malloc(sizeof(unsigned int) * INPUT_MAX_LEN);
+	out->lenFrac = 0;
+	double const decPositiveFrac = fraction_part(decPositive);
+	for (double i = decPositiveFrac; i > 0; i *= base, i -= integer_part(i))
+		out->bodyFrac[out->lenFrac++] = (unsigned int)(i * base);
+
+	// Revert fraction part
+	for (unsigned int i = 0; i < out->lenFrac / 2; ++i) {
+		unsigned int const swapTargetToI = out->lenFrac - i - 2;
+		unsigned int const temp = out->bodyFrac[i];
+		out->bodyFrac[i] = out->bodyFrac[swapTargetToI];
+		out->bodyFrac[swapTargetToI] = temp;
+	}
+
 	return OK;
 }
 
