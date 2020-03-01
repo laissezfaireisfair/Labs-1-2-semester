@@ -338,6 +338,8 @@ error print(Num const *num) {
 		if (status != OK)
 			return status;
 	}
+	if (num->lenInt == 0)
+		fprintf(fout, "0");
 
 	if (num->lenFrac != 0)
 		fprintf(fout, ".");
