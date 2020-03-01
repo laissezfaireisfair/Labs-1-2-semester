@@ -359,42 +359,62 @@ error print(Num const *num) {
 	return OK;
 }
 
+void print_error() {
+	FILE *fout = fopen(OUTPUT_FILE_NAME, "w");
+	if (fout == NULL)
+		exit(RUNTIME_ERROR);
+	fprintf(fout, "bad input");
+	fclose(fout);
+}
+
 int main() {
 	unsigned int base1, base2;
 	char str[INPUT_MAX_LEN];
 
 	error const readStatus = read(&base1, &base2, str);
-	if (readStatus != OK)
+	if (readStatus != OK) {
+		print_error();
 		return readStatus;
+	}
 
 	// LSB should be at the beginning
 	char *beginOfDigits = str[0] == '-' ? str + 1 : str;
 	error const revertStatus = revert_str(beginOfDigits);
-	if (revertStatus != OK)
+	if (revertStatus != OK) {
+		print_error();
 		return revertStatus;
+	}
 
 	Num num = make_num();
 	error const initStatus = init_num_with_str(str, base1, &num);
-	if (initStatus != OK)
+	if (initStatus != OK) {
+		print_error();
 		return initStatus;
+	}
 
 	Num numConversed = make_num();
 	if (base1 != base2) {
 		double decNumber;
 		error const decShowStatus = num_to_dec(&num, &decNumber);
-		if (decShowStatus != OK)
+		if (decShowStatus != OK) {
+			print_error();
 			return decShowStatus;
+		}
 
 		error const convStatus = init_num_with_dec(decNumber, base2, &numConversed);
-		if (convStatus != OK)
+		if (convStatus != OK) {
+			print_error();
 			return convStatus;
+		}
 	} else {
 		numConversed = num;
 	}
 
 	error const printStatus = print(&numConversed);;
-	if (printStatus != OK)
+	if (printStatus != OK) {
+		print_error();
 		return printStatus;
+	}
 
 	return OK;
 }
