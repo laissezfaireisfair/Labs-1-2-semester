@@ -6,7 +6,7 @@ int const          FALSE            = 0;
 unsigned int const MAX_BASE         = 16;
 unsigned int const MIN_BASE         = 2;
 unsigned int const INPUT_MAX_LEN    = 13;
-unsigned int const FRAC_OUT_MAX_LEN    = 12;
+unsigned int const FRAC_OUT_MAX_LEN = 12;
 char const * const INPUT_FILE_NAME  = "in.txt";
 char const * const OUTPUT_FILE_NAME = "out.txt";
 
@@ -17,10 +17,10 @@ typedef enum errors error;
 typedef struct _Num {
 	unsigned char negative;
 	unsigned int  base;
-  unsigned int* bodyInt;
-  unsigned int  lenInt;
-  unsigned int* bodyFrac;
-  unsigned int  lenFrac;
+	unsigned int  lenInt;
+	unsigned int  lenFrac;
+  char          *bodyInt;  // It is NOT a string (just byte array)
+  char          *bodyFrac; // It is NOT a string (just byte array)
 } Num;
 
 Num make_num() {
@@ -42,6 +42,47 @@ error delete_num(Num *num) {
 	return OK;
 }
 
+int is_digit(char const symbol, unsigned int const base) {
+	if (symbol >= '0' && symbol <= '9') {
+		if (symbol - '0' < base)
+			return TRUE;
+		else
+			return FALSE;
+	}
+
+	if (symbol >= 'A' && symbol <= 'Z') {
+		if (symbol - 'A' + 10 < base)
+			return TRUE;
+		else
+			return FALSE;
+	}
+
+	return FALSE;
+}
+
+error to_digit(char const symbol, unsigned int const base, char *digit) {
+	if (digit == NULL)
+		return NULL_POINTER;
+
+	if (symbol >= '0' && symbol <= '9') {
+		if (symbol - '0' < base) {
+			*digit = symbol - '0';
+			return OK;
+		} else
+			return INVALID_ARGUMENT;
+	}
+
+	if (symbol >= 'A' && symbol <= 'Z') {
+		if (symbol - 'A' + 10 < base) {
+			*digit = symbol - 'A' + 10;
+			return OK;
+		} else
+			return INVALID_ARGUMENT;
+	}
+
+	return INVALID_ARGUMENT;
+}
+
 /// String should be like "0.1" or "-0.1" where 0 is less significant digit
 error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	if (str == NULL || num == NULL)
@@ -50,8 +91,14 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 		return INVALID_ARGUMENT;
 
 	num->base     = base;
-	num->bodyInt  = (unsigned int*)malloc(sizeof(unsigned int) * INPUT_MAX_LEN);
-	num->bodyFrac = (unsigned int*)malloc(sizeof(unsigned int) * INPUT_MAX_LEN);
+	num->bodyInt  = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
+	if (num->bodyInt == NULL)
+		return RUNTIME_ERROR;
+	num->bodyFrac = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
+	if (num->bodyFrac == NULL) {
+		free(num->bodyInt);
+		return RUNTIME_ERROR;
+	}
 
 	unsigned int i = 0; // Iter in str[]
 	if (str[0] == '-') {
@@ -68,22 +115,22 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 			free(num->bodyFrac);
 			return LENGTH_ERROR;
 		}
-		if (str[i] < '0' || str[i] > '0' + base - 1) {
+		if (to_digit(str[i], base, num->bodyFrac + j) != OK) {
 			free(num->bodyInt);
 			free(num->bodyFrac);
 			return INVALID_ARGUMENT;
 		}
-		num->bodyFrac[j] = str[i] - '0';
+
 		num->lenFrac = j + 1;
 	}
 
-	if (str[i] == 0) { // If there is no point it was integer part, so swap it
-		unsigned int *tempPtr = num->bodyFrac;
-		num->bodyFrac = num->bodyInt;
-		num->bodyInt = tempPtr;
-		unsigned int temp = num->lenFrac;
-		num->lenFrac = num->lenInt;
-		num->lenInt = temp;
+	if (str[i] == 0) { // If there is no point, then it was integer part: swap it
+		char *tempPtr = num->bodyFrac;
+		num->bodyFrac         = num->bodyInt;
+		num->bodyInt          = tempPtr;
+		unsigned int temp     = num->lenFrac;
+		num->lenFrac          = num->lenInt;
+		num->lenInt           = temp;
 		return OK;
 	}
 	if (i == INPUT_MAX_LEN - 2 && str[i] == '.') { // Point as last symbol
@@ -100,12 +147,12 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 			free(num->bodyFrac);
 			return LENGTH_ERROR;
 		}
-		if (str[i] < '0' || str[i] > '0' + base - 1) {
+		if (to_digit(str[i], base, num->bodyInt + j) != OK) {
 			free(num->bodyInt);
 			free(num->bodyFrac);
 			return INVALID_ARGUMENT;
 		}
-		num->bodyInt[j] = str[i] - '0';
+
 		num->lenInt = j + 1;
 	}
 
@@ -174,7 +221,7 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 			}
 			return BAD_INPUT;
 		}
-		if (symbol < '0' || symbol > '0' + *bI - 1)
+		if (!is_digit(symbol, *bI))
 				return BAD_INPUT;
 		str[i] = symbol;
 	}
@@ -224,7 +271,9 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 
 	if (dec == 0) {
 		out->lenInt = 1;
-		out->bodyInt = (unsigned int*)malloc(sizeof(unsigned int));
+		out->bodyInt = (char*)malloc(sizeof(char));
+		if (out->bodyInt == NULL)
+			return RUNTIME_ERROR;
 		out->bodyInt[0] = 0;
 		out->lenFrac = 0;
 		out->bodyFrac = NULL;
@@ -235,13 +284,19 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 	double const decPositive = (out->negative) ? dec * -1. : dec;
 
 	// Convert integer part
-	out->bodyInt = (unsigned int*)malloc(sizeof(unsigned int) * INPUT_MAX_LEN);
+	out->bodyInt = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
+	if (out->bodyInt == NULL)
+		return RUNTIME_ERROR;
 	out->lenInt = 0;
 	for (unsigned int i = decPositive; i > 0; i /= base)
 		out->bodyInt[out->lenInt++] = i % base;
 
 	// Convert fraction part (warning: result is reverted)
-	out->bodyFrac = (unsigned int*)malloc(sizeof(unsigned int) * INPUT_MAX_LEN);
+	out->bodyFrac = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
+	if (out->bodyFrac == NULL) {
+		free(out->bodyInt);
+		return RUNTIME_ERROR;
+	}
 	out->lenFrac = 0;
 	double const decPositiveFrac = fraction_part(decPositive);
 	for (double i = decPositiveFrac; i > 0; i *= base, i -= integer_part(i)) {
@@ -262,8 +317,8 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 }
 
 /// Will use trash symbols if MAX_BASE > 26
-error print_digit(unsigned int const digit, FILE* fout) {
-	if (digit >= MAX_BASE)
+error print_digit(char const digit, FILE* fout) {
+	if (digit < 0 || digit >= MAX_BASE)
 		return INVALID_ARGUMENT;
 	char symbol;
 	if (digit < 10)
