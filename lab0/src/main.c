@@ -76,8 +76,15 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 		num->lenFrac = j + 1;
 	}
 
-	if (str[i] == 0)
+	if (str[i] == 0) { // If there is no point it was integer part, so swap it
+		unsigned int *tempPtr = num->bodyFrac;
+		num->bodyFrac = num->bodyInt;
+		num->bodyInt = tempPtr;
+		unsigned int temp = num->lenFrac;
+		num->lenFrac = num->lenInt;
+		num->lenInt = temp;
 		return OK;
+	}
 	if (i == INPUT_MAX_LEN - 2 && str[i] == '.') { // Point as last symbol
 		free(num->bodyInt);
 		free(num->bodyFrac);
