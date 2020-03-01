@@ -131,6 +131,8 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 		return NULL_POINTER;
 
 	FILE *fin = fopen(INPUT_FILE_NAME, "r");
+	if (fin == NULL)
+		return RUNTIME_ERROR;
 
 	int const baseReadStatus = fscanf(fin, "%u %u\n", bI, bO);
 
@@ -248,6 +250,32 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 	return OK;
 }
 
+error print(Num const *num) {
+	if (num == NULL)
+		return NULL_POINTER;
+	if (num->bodyInt == NULL) // Check for uninitialised Num
+		return INVALID_ARGUMENT;
+
+	FILE *fout = fopen(OUTPUT_FILE_NAME, "w");
+	if (fout == NULL)
+		return RUNTIME_ERROR;
+
+	for (unsigned int i = 0; i < num->lenInt; ++i) {
+		unsigned int const revertedI = num->lenInt - i - 1;
+		fprintf(fout, "%d", num->bodyInt[revertedI]);
+	}
+
+	if (num->lenFrac != 0)
+		fprintf(fout, ".");
+	for (unsigned int i = 0; i < num->lenFrac; ++i) {
+		unsigned int const revertedI = num->lenFrac - i - 1;
+		fprintf(fout, "%d", num->bodyFrac[revertedI]);
+	}
+
+	fclose(fout);
+	return OK;
+}
+
 int main() {
 	unsigned int base1, base2;
 	char str[INPUT_MAX_LEN];
@@ -297,7 +325,10 @@ int main() {
 		printf("Numbers are not equal. Sth gone wrong.\n");
 		return RUNTIME_ERROR;
 	}
-
 	printf("Numbers are equal. All right.\n");
+
+	print(&numConversed);
+	printf("Output printed to file.\n");
+
 	return OK;
 }
