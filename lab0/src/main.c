@@ -44,14 +44,14 @@ error delete_num(Num *num) {
 
 int is_digit(char const symbol, unsigned int const base) {
 	if (symbol >= '0' && symbol <= '9') {
-		if (symbol - '0' < base)
+		if ((unsigned int)(symbol - '0') < base)
 			return TRUE;
 		else
 			return FALSE;
 	}
 
 	if (symbol >= 'A' && symbol <= 'Z') {
-		if (symbol - 'A' + 10 < base)
+		if ((unsigned int)(symbol - 'A' + 10) < base)
 			return TRUE;
 		else
 			return FALSE;
@@ -65,7 +65,7 @@ error to_digit(char const symbol, unsigned int const base, char *digit) {
 		return NULL_POINTER;
 
 	if (symbol >= '0' && symbol <= '9') {
-		if (symbol - '0' < base) {
+		if ((unsigned int)(symbol - '0') < base) {
 			*digit = symbol - '0';
 			return OK;
 		} else
@@ -73,7 +73,7 @@ error to_digit(char const symbol, unsigned int const base, char *digit) {
 	}
 
 	if (symbol >= 'A' && symbol <= 'Z') {
-		if (symbol - 'A' + 10 < base) {
+		if ((unsigned int)(symbol - 'A' + 10) < base) {
 			*digit = symbol - 'A' + 10;
 			return OK;
 		} else
@@ -318,7 +318,7 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 
 /// Will use trash symbols if MAX_BASE > 26
 error print_digit(char const digit, FILE* fout) {
-	if (digit < 0 || digit >= MAX_BASE)
+	if (digit < 0 || (unsigned int)(digit) >= MAX_BASE)
 		return INVALID_ARGUMENT;
 	char symbol;
 	if (digit < 10)
