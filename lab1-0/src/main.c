@@ -20,7 +20,7 @@ String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
   for (int strEnded = FALSE; !strEnded && str.length < str.capacity;) {
     char symbol;
     int readStatus = fscanf(fin, "%c", &symbol);
-    if (readStatus != 0) {
+    if (readStatus == 0) {
       free(str.body);
       str.body = NULL;
       str.length = 0;
