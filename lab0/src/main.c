@@ -6,6 +6,7 @@ int const          FALSE            = 0;
 unsigned int const MAX_BASE         = 16;
 unsigned int const MIN_BASE         = 2;
 unsigned int const INPUT_MAX_LEN    = 13;
+unsigned int const RESULT_MAX_LEN   = INPUT_MAX_LEN * 4; // log(MIN_BASE,MAX_BASE)
 unsigned int const FRAC_OUT_MAX_LEN = 12;
 char const * const INPUT_FILE_NAME  = "in.txt";
 char const * const OUTPUT_FILE_NAME = "out.txt";
@@ -91,10 +92,10 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 		return INVALID_ARGUMENT;
 
 	num->base     = base;
-	num->bodyInt  = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
+	num->bodyInt  = (char*)malloc(sizeof(char) * RESULT_MAX_LEN);
 	if (num->bodyInt == NULL)
 		return RUNTIME_ERROR;
-	num->bodyFrac = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
+	num->bodyFrac = (char*)malloc(sizeof(char) * RESULT_MAX_LEN);
 	if (num->bodyFrac == NULL) {
 		return RUNTIME_ERROR;
 	}
@@ -109,7 +110,7 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	// Get fraction part of num:
 	num->lenFrac = 0;
 	for (unsigned int j = 0; str[i] != 0 && str[i] != '.'; ++i, ++j) {
-		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1) {
+		if (i == INPUT_MAX_LEN || j == INPUT_MAX_LEN) {
 			return LENGTH_ERROR;
 		}
 		if (to_digit(str[i], base, num->bodyFrac + j) != OK) {
@@ -135,7 +136,7 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	// Get integer part of num:
 	i += 1; // Skip symbol of point
 	for (unsigned int j = 0; str[i] != 0; ++i, ++j) {
-		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1) {
+		if (i == INPUT_MAX_LEN || j == INPUT_MAX_LEN) {
 			return LENGTH_ERROR;
 		}
 		if (to_digit(str[i], base, num->bodyInt + j) != OK) {
@@ -277,7 +278,7 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 	double const decPositive = (out->negative) ? dec * -1. : dec;
 
 	// Convert integer part
-	out->bodyInt = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
+	out->bodyInt = (char*)malloc(sizeof(char) * RESULT_MAX_LEN);
 	if (out->bodyInt == NULL)
 		return RUNTIME_ERROR;
 	out->lenInt = 0;
@@ -285,7 +286,7 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 		out->bodyInt[out->lenInt++] = i % base;
 
 	// Convert fraction part (warning: result is reverted)
-	out->bodyFrac = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
+	out->bodyFrac = (char*)malloc(sizeof(char) * RESULT_MAX_LEN);
 	if (out->bodyFrac == NULL) {
 		return RUNTIME_ERROR;
 	}
@@ -363,7 +364,7 @@ void print_error() {
 
 int main() {
 	unsigned int base1, base2;
-	char str[INPUT_MAX_LEN];
+	char str[INPUT_MAX_LEN + 1];
 
 	error const readStatus = read(&base1, &base2, str);
 	if (readStatus != OK) {
