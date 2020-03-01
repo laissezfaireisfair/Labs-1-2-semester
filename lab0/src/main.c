@@ -378,16 +378,19 @@ int main() {
 	if (initStatus != OK)
 		return initStatus;
 
-	double decNumber;
-	error const decShowStatus = num_to_dec(&num, &decNumber);
-	if (decShowStatus != OK)
-		return decShowStatus;
-
 	Num numConversed = make_num();
-	error const convStatus = init_num_with_dec(decNumber, base2, &numConversed);
-	if (convStatus != OK)
-		return convStatus;
+	if (base1 != base2) {
+		double decNumber;
+		error const decShowStatus = num_to_dec(&num, &decNumber);
+		if (decShowStatus != OK)
+			return decShowStatus;
 
+		error const convStatus = init_num_with_dec(decNumber, base2, &numConversed);
+		if (convStatus != OK)
+			return convStatus;
+	} else {
+		numConversed = num;
+	}
 
 	error const printStatus = print(&numConversed);;
 	if (printStatus != OK)
