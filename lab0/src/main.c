@@ -202,6 +202,10 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 		if (symbolReadStatus == 0)
 			return BAD_INPUT;
 		if (symbolReadStatus == EOF || symbol == '\n') {
+			if (symbolReadStatus == EOF && symbol == '.') // Point in the end
+				return BAD_INPUT;
+			if (symbol == '\n' && str[i-1] == '.') // Point in the end
+				return BAD_INPUT;
 			if (i == 0)
 				return BAD_INPUT;
 			else {
@@ -215,6 +219,8 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 		}
 		if (symbol == '.') {
 			if (pointPassed == FALSE) {
+				if (i == INPUT_MAX_LEN - 1) // Point in the end
+					return BAD_INPUT;
 				pointPassed = TRUE;
 				str[i] = symbol;
 				continue;
