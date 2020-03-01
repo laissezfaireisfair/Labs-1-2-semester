@@ -352,8 +352,10 @@ error print(Num const *num) {
 	for (unsigned int i = 0; i < num->lenFrac; ++i) {
 		unsigned int const revertedI = num->lenFrac - i - 1;
 		error const status = print_digit(num->bodyFrac[revertedI], fout);
-		if (status != OK)
+		if (status != OK) {
+			fclose(fout);
 			return status;
+		}
 	}
 
 	fprintf(fout, "\n");
