@@ -129,7 +129,7 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 		num->lenInt           = temp;
 		return OK;
 	}
-	if (i == INPUT_MAX_LEN - 2 && str[i] == '.') { // Point as last symbol
+	if (i == INPUT_MAX_LEN - 1 && str[i] == '.') { // Point as last symbol
 		return INVALID_ARGUMENT;
 	}
 
