@@ -355,6 +355,8 @@ error print(Num const *num) {
 			return status;
 	}
 
+	fprintf(fout, "\n");
+
 	fclose(fout);
 	return OK;
 }
@@ -363,7 +365,7 @@ void print_error() {
 	FILE *fout = fopen(OUTPUT_FILE_NAME, "w");
 	if (fout == NULL)
 		exit(RUNTIME_ERROR);
-	fprintf(fout, "bad input");
+	fprintf(fout, "bad input\n");
 	fclose(fout);
 }
 
@@ -389,6 +391,7 @@ int main() {
 	error const initStatus = init_num_with_str(str, base1, &num);
 	if (initStatus != OK) {
 		print_error();
+		delete_num(&num);
 		return initStatus;
 	}
 
@@ -398,22 +401,35 @@ int main() {
 		error const decShowStatus = num_to_dec(&num, &decNumber);
 		if (decShowStatus != OK) {
 			print_error();
+			delete_num(&num);
+			delete_num(&numConversed);
 			return decShowStatus;
 		}
 
 		error const convStatus = init_num_with_dec(decNumber, base2, &numConversed);
 		if (convStatus != OK) {
 			print_error();
+			delete_num(&num);
+			delete_num(&numConversed);
 			return convStatus;
 		}
+		error const printStatus = print(&numConversed);;
+		if (printStatus != OK) {
+			print_error();
+			delete_num(&num);
+			delete_num(&numConversed);
+			return printStatus;
+		}
+		delete_num(&num);
+		delete_num(&numConversed);
 	} else {
-		numConversed = num;
-	}
-
-	error const printStatus = print(&numConversed);;
-	if (printStatus != OK) {
-		print_error();
-		return printStatus;
+		error const printStatus = print(&num);;
+		if (printStatus != OK) {
+			print_error();
+			delete_num(&num);
+			return printStatus;
+		}
+		delete_num(&num);
 	}
 
 	return OK;
