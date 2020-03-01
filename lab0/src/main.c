@@ -179,8 +179,10 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 
 	int const baseReadStatus = fscanf(fin, "%u %u\n", bI, bO);
 
-	if (baseReadStatus == EOF || baseReadStatus == 0)
+	if (baseReadStatus == EOF || baseReadStatus == 0) {
+		fclose(fin);
 		return BAD_INPUT;
+	}
 
 	int pointPassed = FALSE;
 
@@ -337,8 +339,10 @@ error print(Num const *num) {
 	for (unsigned int i = 0; i < num->lenInt; ++i) {
 		unsigned int const revertedI = num->lenInt - i - 1;
 		error const status = print_digit(num->bodyInt[revertedI], fout);
-		if (status != OK)
+		if (status != OK) {
+			fclose(fout);
 			return status;
+		}
 	}
 	if (num->lenInt == 0)
 		fprintf(fout, "0");
