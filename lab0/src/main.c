@@ -286,14 +286,18 @@ error print(Num const *num) {
 
 	for (unsigned int i = 0; i < num->lenInt; ++i) {
 		unsigned int const revertedI = num->lenInt - i - 1;
-		print_digit(num->bodyInt[revertedI], fout);
+		error const status = print_digit(num->bodyInt[revertedI], fout);
+		if (status != OK)
+			return status;
 	}
 
 	if (num->lenFrac != 0)
 		fprintf(fout, ".");
 	for (unsigned int i = 0; i < num->lenFrac; ++i) {
 		unsigned int const revertedI = num->lenFrac - i - 1;
-		print_digit(num->bodyFrac[revertedI], fout);
+		error const status = print_digit(num->bodyFrac[revertedI], fout);
+		if (status != OK)
+			return status;
 	}
 
 	fclose(fout);
@@ -307,52 +311,32 @@ int main() {
 	error const readStatus = read(&base1, &base2, str);
 	if (readStatus != OK)
 		return readStatus;
-	printf("Reading passed.\n");
 
-	int isNegative = str[0] == '-' ? TRUE : FALSE;
-	char *beginOfDigits = isNegative ? str + 1 : str;
-
+	// LSB should be at the beginning
+	char *beginOfDigits = str[0] == '-' ? str + 1 : str;
 	error const revertStatus = revert_str(beginOfDigits);
 	if (revertStatus != OK)
 		return revertStatus;
-	printf("Reverting passed.\n");
 
 	Num num = make_num();
-
 	error const initStatus = init_num_with_str(str, base1, &num);
 	if (initStatus != OK)
 		return initStatus;
-	printf("Initialisation passed.\n");
 
 	double decNumber;
-
 	error const decShowStatus = num_to_dec(&num, &decNumber);
 	if (decShowStatus != OK)
 		return decShowStatus;
-	printf("Number before conversion = %f\n", decNumber);
 
 	Num numConversed = make_num();
-
 	error const convStatus = init_num_with_dec(decNumber, base2, &numConversed);
 	if (convStatus != OK)
 		return convStatus;
-	printf("Conversion passed\n");
 
-	double decNumberAfterConv;
 
-	error const decShowStatus2 = num_to_dec(&numConversed, &decNumberAfterConv);
-	if (decShowStatus2 != OK)
-		return decShowStatus2;
-	printf("Number after conversion = %f\n", decNumberAfterConv);
-
-	if (decNumber != decNumberAfterConv) {
-		printf("Numbers are not equal. Sth gone wrong.\n");
-		return RUNTIME_ERROR;
-	}
-	printf("Numbers are equal. All right.\n");
-
-	print(&numConversed);
-	printf("Output printed to file.\n");
+	error const printStatus = print(&numConversed);;
+	if (printStatus != OK)
+		return printStatus;
 
 	return OK;
 }
