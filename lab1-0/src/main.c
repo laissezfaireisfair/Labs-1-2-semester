@@ -11,7 +11,7 @@ typedef struct _String {
   unsigned int capacity;
 } String;
 
-/// Returns pointer to stt if OK, otherwise - error code
+/// Returns pointer to stt if OK, otherwise - NULL
 String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
   String str;
   str.capacity = STR_CAPACITY;
@@ -19,7 +19,13 @@ String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
   str.length = 0;
   for (int strEnded = FALSE; !strEnded && str.length < str.capacity;) {
     char symbol;
-    fscanf(fin, "%c", &symbol);
+    int readStatus = fscanf(fin, "%c", &symbol);
+    if (readStatus != 0) {
+      free(str.body);
+      str.body = NULL;
+      str.length = 0;
+      return str;
+    }
     if (symbol == '\n') {
       strEnded = TRUE;
       str.body[str.length] = 0;
@@ -48,18 +54,18 @@ int is_substr_here(String const substr, String const str, int const pos, FILE* f
 
 /// Returns 1 if founded, 0 if not founded, otherwise - error code
 int find_substr(String const substr, String const str, FILE* fout) {
-  int const numOfSymbols = 256;
+  unsigned int const numOfSymbols = 256;
   if (substr.length > str.length)
     return 2;
   int stopTable[numOfSymbols];
-  for (int i = 0; i < numOfSymbols; ++i)
+  for (unsigned int i = 0; i < numOfSymbols; ++i)
     stopTable[i] = -1;
-  for (int i = 0; i < substr.length; ++i)
+  for (unsigned int i = 0; i < substr.length; ++i)
     stopTable[substr.body[i]] = i;
   for (unsigned int i = substr.length-1, j = substr.length-1; i < str.length;) {
     unsigned char const symbFromStr = str.body[i];
     unsigned char const symbFromSubstr = substr.body[j];
-    fprintf(fout, "%d ", i + 1);
+    fprintf(fout, "%u ", i + 1);
     if (symbFromStr == symbFromSubstr) {
       const int beginPerhapsPos = i - stopTable[symbFromStr];
       const int checkStatus = is_substr_here(substr, str, beginPerhapsPos, fout);
