@@ -6,6 +6,7 @@ int const          FALSE            = 0;
 unsigned int const MAX_BASE         = 16;
 unsigned int const MIN_BASE         = 2;
 unsigned int const INPUT_MAX_LEN    = 13;
+unsigned int const FRAC_OUT_MAX_LEN    = 12;
 char const * const INPUT_FILE_NAME  = "in.txt";
 char const * const OUTPUT_FILE_NAME = "out.txt";
 
@@ -243,8 +244,11 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 	out->bodyFrac = (unsigned int*)malloc(sizeof(unsigned int) * INPUT_MAX_LEN);
 	out->lenFrac = 0;
 	double const decPositiveFrac = fraction_part(decPositive);
-	for (double i = decPositiveFrac; i > 0; i *= base, i -= integer_part(i))
+	for (double i = decPositiveFrac; i > 0; i *= base, i -= integer_part(i)) {
 		out->bodyFrac[out->lenFrac++] = (unsigned int)(i * base);
+		if (out->lenFrac == FRAC_OUT_MAX_LEN)
+			break;
+	}
 
 	// Revert fraction part
 	for (unsigned int i = 0; i < out->lenFrac / 2; ++i) {
