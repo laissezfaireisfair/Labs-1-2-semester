@@ -307,7 +307,7 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 
 	// Revert fraction part
 	for (unsigned int i = 0; i < out->lenFrac / 2; ++i) {
-		unsigned int const swapTargetToI = out->lenFrac - i - 2;
+		unsigned int const swapTargetToI = out->lenFrac - i - 1;
 		unsigned int const temp = out->bodyFrac[i];
 		out->bodyFrac[i] = out->bodyFrac[swapTargetToI];
 		out->bodyFrac[swapTargetToI] = temp;
