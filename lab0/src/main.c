@@ -250,6 +250,19 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 	return OK;
 }
 
+/// Will use trash symbols if MAX_BASE > 26
+error print_digit(unsigned int const digit, FILE* fout) {
+	if (digit >= MAX_BASE)
+		return INVALID_ARGUMENT;
+	char symbol;
+	if (digit < 10)
+		symbol = digit + '0';
+	else
+		symbol = digit - 10 + 'A';
+	fprintf(fout, "%c", symbol);
+	return OK;
+}
+
 error print(Num const *num) {
 	if (num == NULL)
 		return NULL_POINTER;
@@ -262,14 +275,14 @@ error print(Num const *num) {
 
 	for (unsigned int i = 0; i < num->lenInt; ++i) {
 		unsigned int const revertedI = num->lenInt - i - 1;
-		fprintf(fout, "%d", num->bodyInt[revertedI]);
+		print_digit(num->bodyInt[revertedI], fout);
 	}
 
 	if (num->lenFrac != 0)
 		fprintf(fout, ".");
 	for (unsigned int i = 0; i < num->lenFrac; ++i) {
 		unsigned int const revertedI = num->lenFrac - i - 1;
-		fprintf(fout, "%d", num->bodyFrac[revertedI]);
+		print_digit(num->bodyFrac[revertedI], fout);
 	}
 
 	fclose(fout);
