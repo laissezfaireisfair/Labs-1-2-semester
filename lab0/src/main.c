@@ -120,7 +120,7 @@ error num_to_dec(Num const *num, double *out) {
 	for (int i = num->lenFrac - 1; i >= 0; --i, j /= num->base)
 		*out += num->bodyFrac[(unsigned int)i] * j;
 	for (unsigned int i = 0, k = 1; i < num->lenInt; ++i, k *= num->base)
-		*out += num->bodyFrac[i] * k;
+		*out += num->bodyInt[i] * k;
 	if (num->negative)
 		*out *= -1.;
 	return OK;
@@ -227,7 +227,7 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 	// Convert integer part
 	out->bodyInt = (unsigned int*)malloc(sizeof(unsigned int) * INPUT_MAX_LEN);
 	out->lenInt = 0;
-	for (unsigned int i = decPositive; i >= 0; i /= base)
+	for (unsigned int i = decPositive; i > 0; i /= base)
 		out->bodyInt[out->lenInt++] = i % base;
 
 	// Convert fraction part (warning: result is reverted)
@@ -252,7 +252,7 @@ int main() {
 	unsigned int base1, base2;
 	char str[INPUT_MAX_LEN];
 
-	error readStatus = read(&base1, &base2, str);
+	error const readStatus = read(&base1, &base2, str);
 	if (readStatus != OK)
 		return readStatus;
 	printf("Reading passed.\n");
@@ -260,24 +260,44 @@ int main() {
 	int isNegative = str[0] == '-' ? TRUE : FALSE;
 	char *beginOfDigits = isNegative ? str + 1 : str;
 
-	error revertStatus = revert_str(beginOfDigits);
+	error const revertStatus = revert_str(beginOfDigits);
 	if (revertStatus != OK)
 		return revertStatus;
 	printf("Reverting passed.\n");
 
 	Num num = make_num();
 
-	error initStatus = init_num_with_str(str, base1, &num);
+	error const initStatus = init_num_with_str(str, base1, &num);
 	if (initStatus != OK)
 		return initStatus;
 	printf("Initialisation passed.\n");
 
 	double decNumber;
 
-	error conversionStatus = num_to_dec(&num, &decNumber);
-	if (conversionStatus != OK)
-		return conversionStatus;
-	printf("Conversion passed. number = %f\n", decNumber);
+	error const decShowStatus = num_to_dec(&num, &decNumber);
+	if (decShowStatus != OK)
+		return decShowStatus;
+	printf("Number before conversion = %f\n", decNumber);
 
+	Num numConversed = make_num();
+
+	error const convStatus = init_num_with_dec(decNumber, base2, &numConversed);
+	if (convStatus != OK)
+		return convStatus;
+	printf("Conversion passed\n");
+
+	double decNumberAfterConv;
+
+	error const decShowStatus2 = num_to_dec(&numConversed, &decNumberAfterConv);
+	if (decShowStatus2 != OK)
+		return decShowStatus2;
+	printf("Number after conversion = %f\n", decNumberAfterConv);
+
+	if (decNumber != decNumberAfterConv) {
+		printf("Numbers are not equal. Sth gone wrong.\n");
+		return RUNTIME_ERROR;
+	}
+
+	printf("Numbers are equal. All right.\n");
 	return OK;
 }
