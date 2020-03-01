@@ -201,6 +201,8 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 				break;
 			}
 		}
+		if (symbol >= 'A' && symbol <= 'Z')
+			symbol = symbol - 'A' + 'a';
 		if (symbol == '-' && i == 0) {
 			str[i] = symbol;
 			continue;
