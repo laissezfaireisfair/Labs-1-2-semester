@@ -218,7 +218,7 @@ error read(unsigned int *bI, unsigned int *bO, char *str)	{
 			continue;
 		}
 		if (symbol == '.') {
-			if (pointPassed == FALSE) {
+			if (pointPassed == FALSE && i > 0) { // i > 0 for point in the beginnig
 				if (i == INPUT_MAX_LEN - 1) // Point in the end
 					return BAD_INPUT;
 				pointPassed = TRUE;
