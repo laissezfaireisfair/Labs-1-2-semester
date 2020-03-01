@@ -50,8 +50,8 @@ int is_digit(char const symbol, unsigned int const base) {
 			return FALSE;
 	}
 
-	if (symbol >= 'A' && symbol <= 'Z') {
-		if ((unsigned int)(symbol - 'A' + 10) < base)
+	if (symbol >= 'a' && symbol <= 'z') {
+		if ((unsigned int)(symbol - 'a' + 10) < base)
 			return TRUE;
 		else
 			return FALSE;
@@ -72,9 +72,9 @@ error to_digit(char const symbol, unsigned int const base, char *digit) {
 			return INVALID_ARGUMENT;
 	}
 
-	if (symbol >= 'A' && symbol <= 'Z') {
-		if ((unsigned int)(symbol - 'A' + 10) < base) {
-			*digit = symbol - 'A' + 10;
+	if (symbol >= 'a' && symbol <= 'z') {
+		if ((unsigned int)(symbol - 'a' + 10) < base) {
+			*digit = symbol - 'a' + 10;
 			return OK;
 		} else
 			return INVALID_ARGUMENT;
@@ -96,7 +96,6 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 		return RUNTIME_ERROR;
 	num->bodyFrac = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
 	if (num->bodyFrac == NULL) {
-		free(num->bodyInt);
 		return RUNTIME_ERROR;
 	}
 
@@ -111,13 +110,9 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	num->lenFrac = 0;
 	for (unsigned int j = 0; str[i] != 0 && str[i] != '.'; ++i, ++j) {
 		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1) {
-			free(num->bodyInt);
-			free(num->bodyFrac);
 			return LENGTH_ERROR;
 		}
 		if (to_digit(str[i], base, num->bodyFrac + j) != OK) {
-			free(num->bodyInt);
-			free(num->bodyFrac);
 			return INVALID_ARGUMENT;
 		}
 
@@ -134,8 +129,6 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 		return OK;
 	}
 	if (i == INPUT_MAX_LEN - 2 && str[i] == '.') { // Point as last symbol
-		free(num->bodyInt);
-		free(num->bodyFrac);
 		return INVALID_ARGUMENT;
 	}
 
@@ -143,13 +136,9 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	i += 1; // Skip symbol of point
 	for (unsigned int j = 0; str[i] != 0; ++i, ++j) {
 		if (i == INPUT_MAX_LEN - 1 || j == INPUT_MAX_LEN - 1) {
-			free(num->bodyInt);
-			free(num->bodyFrac);
 			return LENGTH_ERROR;
 		}
 		if (to_digit(str[i], base, num->bodyInt + j) != OK) {
-			free(num->bodyInt);
-			free(num->bodyFrac);
 			return INVALID_ARGUMENT;
 		}
 
@@ -157,8 +146,6 @@ error init_num_with_str(char const *str, unsigned int const base, Num *num) {
 	}
 
 	if (num->lenInt == 0 && num->lenFrac == 0) {
-		free(num->bodyInt);
-		free(num->bodyFrac);
 		return INVALID_ARGUMENT;
 	}
 
@@ -300,7 +287,6 @@ error init_num_with_dec(double const dec, unsigned int const base, Num *out) {
 	// Convert fraction part (warning: result is reverted)
 	out->bodyFrac = (char*)malloc(sizeof(char) * INPUT_MAX_LEN);
 	if (out->bodyFrac == NULL) {
-		free(out->bodyInt);
 		return RUNTIME_ERROR;
 	}
 	out->lenFrac = 0;
@@ -330,7 +316,7 @@ error print_digit(char const digit, FILE* fout) {
 	if (digit < 10)
 		symbol = digit + '0';
 	else
-		symbol = digit - 10 + 'A';
+		symbol = digit - 10 + 'a';
 	fprintf(fout, "%c", symbol);
 	return OK;
 }
