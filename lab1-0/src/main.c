@@ -11,7 +11,6 @@ typedef struct _String {
   unsigned int capacity;
 } String;
 
-/// Returns pointer to stt if OK, otherwise - NULL
 String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
   String str;
   str.capacity = STR_CAPACITY;
@@ -35,56 +34,34 @@ String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
     }
   }
   return str;
-}
-
-/// Returns 1 if substr, 0 - not substr, otherwise - error code
-int is_substr_here(String const substr, String const str, int const pos, FILE* fout) {
-  if (str.length == 0 || substr.length == 0)
-    return 2;
-  if (str.length < substr.length + pos)
-    return 0;
-  for (int i = substr.length - 1; i >= 0; --i) {
-    fprintf(fout, "%d ", i + pos + 1);
-    if (substr.body[i] != str.body[i + pos])
-      return 0;
-  }
-  return 1;
-}
-
+ }
 
 /// Returns 1 if founded, 0 if not founded, otherwise - error code
 int find_substr(String const substr, String const str, FILE* fout) {
   unsigned int const numOfSymbols = 256;
   if (substr.length > str.length)
     return 2;
-  int stopTable[numOfSymbols];
+  int stopTable[numOfSymbols]; // Distance from begin to first symbol position
   for (unsigned int i = 0; i < numOfSymbols; ++i)
     stopTable[i] = -1;
   for (unsigned int i = 0; i < substr.length; ++i)
-    stopTable[substr.body[i]] = i;
-  for (unsigned int i = substr.length-1, j = substr.length-1; i < str.length;) {
-    unsigned char const symbFromStr = str.body[i];
-    unsigned char const symbFromSubstr = substr.body[j];
+    stopTable[substr.body[substr.length - i - 1]] = substr.length - i - 1;
+  for (unsigned int i = substr.length - 1, j = i, last = i; i < str.length;) {
+    if (last < i)
+      last = i; // Last checked symbol
     fprintf(fout, "%u ", i + 1);
-    if (symbFromStr == symbFromSubstr) {
-      const int beginPerhapsPos = i - stopTable[symbFromStr];
-      const int checkStatus = is_substr_here(substr, str, beginPerhapsPos, fout);
-      if (checkStatus == 1)
+    if (substr.body[j] == str.body[i]) {
+      if (j == 0)
         return 1;
-      if (checkStatus == 0) {
-        i += substr.length - 1;
-        j = 0;
-        continue;
-      }
-      return checkStatus;
+      --j;
+      --i;
+      continue;
     }
+    if (stopTable[str.body[last]] != -1)
+      i = last + substr.length - stopTable[str.body[last]] - 1;
     else
-      if (stopTable[symbFromStr] != -1)
-        j = stopTable[symbFromStr];
-      else {
-        i += substr.length;
-        j = 0;
-      }
+      i = last + substr.length;
+    j = substr.length - 1;
   }
   return 0;
 }
@@ -105,6 +82,7 @@ int main(void) {
   fclose(fin);
   FILE* fout = fopen("out.txt", "w");
   int const status = find_substr(substr, str, fout);
+  fprintf(fout, "\n");
   fclose(fout);
   free(substr.body);
   free(str.body);
