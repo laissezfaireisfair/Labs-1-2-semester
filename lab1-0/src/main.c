@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <assert.h>
 
 char const TRUE = 1;
 char const FALSE = 0;
@@ -12,6 +13,7 @@ typedef struct _String {
 } String;
 
 String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
+  assert(fin != NULL);
   String str;
   str.capacity = STR_CAPACITY;
   str.body = (unsigned char*)malloc(sizeof(unsigned char) * str.capacity);
@@ -38,11 +40,14 @@ String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
 
 /// Returns 1 if founded, 0 if not founded, otherwise - error code
 int find_substr(String const substr, String const str, FILE* fout) {
-  unsigned int const numOfSymbols = 256;
+  unsigned int const maxNumOfSymbols = 256;
+  assert(fout != NULL);
+  assert(substr.length != 0);
+  assert(str.length != 0);
   if (substr.length > str.length)
     return 2;
-  int stopTable[numOfSymbols]; // Distance from begin to first symbol position
-  for (unsigned int i = 0; i < numOfSymbols; ++i)
+  int stopTable[maxNumOfSymbols]; // Distance from begin to first symbol position
+  for (unsigned int i = 0; i < maxNumOfSymbols; ++i)
     stopTable[i] = -1;
   for (unsigned int i = 0; i < substr.length; ++i)
     stopTable[substr.body[substr.length - i - 1]] = substr.length - i - 1;
@@ -86,7 +91,7 @@ int main(void) {
   fclose(fout);
   free(substr.body);
   free(str.body);
-  if (status != 1)
+  if (status != 1 && status != 0)
     return 3;
   return 0;
 }
