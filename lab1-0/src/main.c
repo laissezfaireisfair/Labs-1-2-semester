@@ -25,7 +25,7 @@ String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
       str.length = 0;
       return str;
     }
-    if (symbol == '\n') {
+    if (symbol == '\n' || readStatus == EOF) {
       strEnded = TRUE;
       str.body[str.length] = 0;
     } else {
