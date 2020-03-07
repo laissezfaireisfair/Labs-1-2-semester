@@ -17,23 +17,15 @@ String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
   String str;
   str.capacity = STR_CAPACITY;
   str.body = (unsigned char*)malloc(sizeof(unsigned char) * str.capacity);
+  assert(str.body != NULL);
   str.length = 0;
-  for (int strEnded = FALSE; !strEnded && str.length < str.capacity;) {
+  for (; str.length < str.capacity; ++str.length) {
     char symbol;
-    int readStatus = fscanf(fin, "%c", &symbol);
-    if (readStatus == 0) {
-      free(str.body);
-      str.body = NULL;
-      str.length = 0;
-      return str;
-    }
-    if (symbol == '\n' || readStatus == EOF) {
-      strEnded = TRUE;
+    if (fscanf(fin, "%c", &symbol) == EOF) {
       str.body[str.length] = 0;
-    } else {
-      str.body[str.length] = symbol;
-      ++str.length;
+      break;
     }
+    str.body[str.length] = symbol;
   }
   return str;
  }
@@ -74,16 +66,7 @@ void find_substr(String const substr, String const str, FILE* fout) {
 int main(void) {
   FILE* fin = fopen("in.txt", "r");
   String substr = ask_String(fin);
-  if (substr.body == NULL) {
-    fclose(fin);
-    return 1;
-  }
   String str = ask_String(fin);
-  if (str.body == NULL) {
-    fclose(fin);
-    free(substr.body);
-    return 2;
-  }
   fclose(fin);
   FILE* fout = fopen("out.txt", "w");
   find_substr(substr, str, fout);
