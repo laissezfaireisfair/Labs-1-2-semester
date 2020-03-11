@@ -12,7 +12,25 @@ typedef struct _String {
   unsigned int capacity;
 } String;
 
-String ask_String(FILE* fin) { //TODO: Make it memory-friendly and not limited
+String ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
+  assert(fin != NULL);
+  String str;
+  str.capacity = STR_CAPACITY;
+  str.body = (unsigned char*)malloc(sizeof(unsigned char) * str.capacity);
+  assert(str.body != NULL);
+  str.length = 0;
+  for (; str.length < str.capacity; ++str.length) {
+    char symbol;
+    if (fscanf(fin, "%c", &symbol) == EOF || symbol == '\n') {
+      str.body[str.length] = 0;
+      break;
+    }
+    str.body[str.length] = symbol;
+  }
+  return str;
+ }
+
+String ask_text(FILE* fin) { //TODO: Make it memory-friendly and not limited
   assert(fin != NULL);
   String str;
   str.capacity = STR_CAPACITY;
@@ -65,8 +83,8 @@ void find_substr(String const substr, String const str, FILE* fout) {
 
 int main(void) {
   FILE* fin = fopen("in.txt", "r");
-  String substr = ask_String(fin);
-  String str = ask_String(fin);
+  String substr = ask_string(fin);
+  String str = ask_text(fin);
   fclose(fin);
   FILE* fout = fopen("out.txt", "w");
   find_substr(substr, str, fout);
