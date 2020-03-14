@@ -1,4 +1,7 @@
 #pragma once
+#include <stdlib.h>
+#include <stdio.h>
+#include "Errors.h"
 #include "Sequence.h"
 
 error permutate_to_next(Sequence *seq);
