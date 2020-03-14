@@ -1,4 +1,6 @@
 #pragma once
+#include <stdlib.h>
+#include <stdio.h>
 #include "Errors.h"
 
 typedef struct _Sequence {

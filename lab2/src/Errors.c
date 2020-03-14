@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include "Errors.h"
 
 void print_error(char *filename, error const err) {
