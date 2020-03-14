@@ -64,3 +64,14 @@ error ask_sequence(FILE* fin, Sequence *out, unsigned int const maxLen) {
   deinit_seq(out);
   return BAD_INPUT;
  }
+
+error print_sequence(FILE* fout, Sequence const seq) {
+  if (fout == NULL)
+    return NULL_POINTER;
+
+  for (unsigned int i = 0; i < seq->length; ++i)
+    fprintf(fout, "%c", seq->body[i]);
+
+  fprintf(fout, "\n");
+  return OK;
+}
