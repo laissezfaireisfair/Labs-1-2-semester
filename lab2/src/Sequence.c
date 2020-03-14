@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include "Sequence.h"
 
 Sequence make_seq() {
@@ -22,11 +24,43 @@ error init_seq(Sequence *seq, unsigned int capReq) {
   return OK;
 }
 
-error deinit_seq(seqgin *seq) {
+void deinit_seq(seqgin *seq) {
   if (seq == NULL)
-    return NULL_POINTER;
+    exit(NULL_POINTER);
   if (seq.body == NULL)
-    return INVALID_ARGUMENT;
+    exit(INVALID_ARGUMENT);
   free(seq->body);
   return OK;
 }
+
+error ask_sequence(FILE* fin, Sequence *out, unsigned int const maxLen) {
+  if (fin == NULL || out == NULL)
+    return NULL_POINTER;
+  if (maxLen == 0)
+    return LENGTH_ERROR;
+
+  error const initStatus = init_seq(out, maxLen);
+  if (initStatus != OK)
+    return initStatus;
+
+  for (; out->length < out->capacity; ++out->length) {
+    char symbol;
+    error const statusRead = fscanf(fin, "%c", &symbol);
+    if (statusRead == EOF || symbol == '\n')
+      return OK;
+
+    if (statusRead == 0) {
+      deinit_seq(out);
+      return RUNTIME_ERROR;
+    }
+    if (symbol > '9' || symbol < '0') {
+      deinit_seq(out);
+      return BAD_INPUT;
+    }
+
+    out->body[out->length] = symbol - '0';
+  }
+
+  deinit_seq(out);
+  return BAD_INPUT;
+ }
