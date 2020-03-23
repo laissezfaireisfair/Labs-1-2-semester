@@ -14,7 +14,7 @@ error swap(unsigned char *a, unsigned char *b) {
 error revert_array(unsigned char * const begin, unsigned char * const end) {
   if (begin == NULL || end == NULL)
     return NULL_POINTER;
-  for (unsigned char *i = begin, *j = end; i != j; ++i, --j)
+  for (unsigned char *i = begin, *j = end; i < j; ++i, --j)
     swap(i, j);
   return OK;
 }

@@ -30,7 +30,7 @@ int main() {
   }
   fclose(fin);
 
-  FILE *fout = fopen(OUTPUT_FILE_NAME, "r");
+  FILE *fout = fopen(OUTPUT_FILE_NAME, "w");
   if (fout == NULL) {
     print_error("error.txt", RUNTIME_ERROR);
     return RUNTIME_ERROR;

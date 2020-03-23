@@ -45,7 +45,7 @@ error ask_sequence(FILE* fin, Sequence *out, unsigned int const maxLen) {
   for (; out->length < out->capacity; ++out->length) {
     char symbol;
     int const statusRead = fscanf(fin, "%c", &symbol);
-    if (statusRead == EOF || symbol == '\n')
+    if (statusRead == EOF || symbol == '\n' || symbol == '\r')
       return OK;
 
     if (statusRead == 0) {
@@ -69,7 +69,7 @@ error print_sequence(FILE* fout, Sequence const seq) {
     return NULL_POINTER;
 
   for (unsigned int i = 0; i < seq.length; ++i)
-    fprintf(fout, "%c", seq.body[i]);
+    fprintf(fout, "%c", seq.body[i] + '0');
 
   fprintf(fout, "\n");
   return OK;
