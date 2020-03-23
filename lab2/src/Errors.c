@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "Errors.h"
 
-void print_error(char *filename, error const err) {
+void print_error(char const * const filename, error const err) {
 	FILE *fout = fopen(filename, "w");
 	if (fout == NULL)
 		exit(RUNTIME_ERROR);

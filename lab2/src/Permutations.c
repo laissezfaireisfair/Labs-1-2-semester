@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include "Permutations.h"
 
-error swap(unsigned int *a, unsigned int *b) {
+error swap(unsigned char *a, unsigned char *b) {
   if (a == NULL || b == NULL)
     return NULL_POINTER;
   *a ^= *b;
@@ -11,10 +11,10 @@ error swap(unsigned int *a, unsigned int *b) {
   return OK;
 }
 
-error revert_array(unsigned int * const begin, unsigned int * const end) {
-  if (i == NULL || j == NULL)
+error revert_array(unsigned char * const begin, unsigned char * const end) {
+  if (begin == NULL || end == NULL)
     return NULL_POINTER;
-  for (unsigned int *i = begin, *j = end; i != j; ++i, --j)
+  for (unsigned char *i = begin, *j = end; i != j; ++i, --j)
     swap(i, j);
   return OK;
 }
@@ -49,11 +49,11 @@ error permutate_to_next(Sequence *seq) {
 error print_next_permutations(FILE *fout, Sequence const start, unsigned int const num) {
   Sequence seq = start;
   for (unsigned int i = 0; i < num; ++i) {
-    error const permutateStatus = permutate_to_next(seq);
+    error const permutateStatus = permutate_to_next(&seq);
     if (permutateStatus != OK)
       return permutateStatus;
 
-    error const printStatus = print_sequence(seq);
+    error const printStatus = print_sequence(fout, seq);
     if (printStatus != OK)
       return printStatus;
   }

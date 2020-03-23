@@ -24,13 +24,12 @@ error init_seq(Sequence *seq, unsigned int capReq) {
   return OK;
 }
 
-void deinit_seq(seqgin *seq) {
+void deinit_seq(Sequence *seq) {
   if (seq == NULL)
     exit(NULL_POINTER);
-  if (seq.body == NULL)
+  if (seq->body == NULL)
     exit(INVALID_ARGUMENT);
   free(seq->body);
-  return OK;
 }
 
 error ask_sequence(FILE* fin, Sequence *out, unsigned int const maxLen) {
@@ -45,7 +44,7 @@ error ask_sequence(FILE* fin, Sequence *out, unsigned int const maxLen) {
 
   for (; out->length < out->capacity; ++out->length) {
     char symbol;
-    error const statusRead = fscanf(fin, "%c", &symbol);
+    int const statusRead = fscanf(fin, "%c", &symbol);
     if (statusRead == EOF || symbol == '\n')
       return OK;
 
@@ -69,8 +68,8 @@ error print_sequence(FILE* fout, Sequence const seq) {
   if (fout == NULL)
     return NULL_POINTER;
 
-  for (unsigned int i = 0; i < seq->length; ++i)
-    fprintf(fout, "%c", seq->body[i]);
+  for (unsigned int i = 0; i < seq.length; ++i)
+    fprintf(fout, "%c", seq.body[i]);
 
   fprintf(fout, "\n");
   return OK;

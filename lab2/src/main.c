@@ -24,7 +24,7 @@ int main() {
   }
 
   unsigned int num;
-  if (fscanf(fin, "%u", num) == 0) {
+  if (fscanf(fin, "%u", &num) == 0) {
     print_error(OUTPUT_FILE_NAME, BAD_INPUT);
     return BAD_INPUT;
   }
