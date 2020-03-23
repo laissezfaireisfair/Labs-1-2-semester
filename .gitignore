@@ -3,4 +3,5 @@
 build/
 **/in.txt
 **/out.txt
+**/error.txt
 *.out
