@@ -1,7 +1,7 @@
 #pragma once
 #include <stdlib.h>
 
-typedef char valType;
+typedef unsigned int valType;
 
 typedef struct _ListElem {
   valType value;
