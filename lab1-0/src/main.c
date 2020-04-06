@@ -1,64 +1,21 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <assert.h>
+#include "Errors.h"
+#include "String.h"
 
-char const TRUE = 1;
-char const FALSE = 0;
-unsigned int const STR_CAPACITY = 256;
+error find_substr(String const substr, String const str, FILE* fout) {
+  if (fout == NULL)
+    return NULL_POINTER;
+  if (substr.length == 0 || str.length == 0)
+    return INVALID_ARGUMENT;
 
-typedef struct _String {
-  unsigned char* body;
-  unsigned int length;
-  unsigned int capacity;
-} String;
-
-String ask_string(FILE* fin) { //TODO: Make it memory-friendly and not limited
-  assert(fin != NULL);
-  String str;
-  str.capacity = STR_CAPACITY;
-  str.body = (unsigned char*)malloc(sizeof(unsigned char) * str.capacity);
-  assert(str.body != NULL);
-  str.length = 0;
-  for (; str.length < str.capacity; ++str.length) {
-    char symbol;
-    if (fscanf(fin, "%c", &symbol) == EOF || symbol == '\n') {
-      str.body[str.length] = 0;
-      break;
-    }
-    str.body[str.length] = symbol;
-  }
-  return str;
- }
-
-String ask_text(FILE* fin) { //TODO: Make it memory-friendly and not limited
-  assert(fin != NULL);
-  String str;
-  str.capacity = STR_CAPACITY;
-  str.body = (unsigned char*)malloc(sizeof(unsigned char) * str.capacity);
-  assert(str.body != NULL);
-  str.length = 0;
-  for (; str.length < str.capacity; ++str.length) {
-    char symbol;
-    if (fscanf(fin, "%c", &symbol) == EOF) {
-      str.body[str.length] = 0;
-      break;
-    }
-    str.body[str.length] = symbol;
-  }
-  return str;
- }
-
-void find_substr(String const substr, String const str, FILE* fout) {
-  unsigned int const maxNumOfSymbols = 256;
-  assert(fout != NULL);
-  assert(substr.length != 0);
-  assert(str.length != 0);
-  assert(substr.length <= str.length);
-  int stopTable[maxNumOfSymbols]; // Distance from begin to first symbol position
-  for (unsigned int i = 0; i < maxNumOfSymbols; ++i)
+  // Distance from begin to first symbol position:
+  int *stopTable = (int*)malloc(sizeof(int) * substr.length);
+  for (unsigned int i = 0; i < substr.length; ++i)
     stopTable[i] = -1;
   for (unsigned int i = 0; i < substr.length; ++i)
     stopTable[substr.body[substr.length - i - 1]] = substr.length - i - 1;
+
   for (unsigned int i = substr.length - 1, j = i, last = i; i < str.length;) {
     if (last < i)
       last = i; // Last checked symbol
@@ -79,16 +36,51 @@ void find_substr(String const substr, String const str, FILE* fout) {
       i = last + substr.length;
     j = substr.length - 1;
   }
+
+  free(stopTable);
+  return OK;
 }
 
 int main(void) {
-  FILE* fin = fopen("in.txt", "r");
-  String substr = ask_string(fin);
-  String str = ask_text(fin);
+  unsigned int const maxStrLen = 256;
+  char const *inputFilename    = "input.txt";
+  char const *outputFilename   = "output.txt";
+
+  FILE* fin = fopen(inputFilename, "r");
+  if (fin == NULL) {
+    print_error(outputFilename, RUNTIME_ERROR);
+    return 1;
+  }
+
+  String substr = make_str(), str = make_str();
+  error const statusReadStr = ask_string(fin, &substr, maxStrLen);
+  if (statusReadStr != OK) {
+    print_error(outputFilename, statusReadStr);
+    return 2;
+  }
+  error const statusReadTxt = ask_text(fin, &str, maxStrLen);
   fclose(fin);
-  FILE* fout = fopen("out.txt", "w");
-  find_substr(substr, str, fout);
-  fprintf(fout, "\n");
+  if (statusReadTxt != OK) {
+    print_error(outputFilename, statusReadTxt);
+    deinit_str(&substr);
+    return 3;
+  }
+
+  FILE* fout = fopen(outputFilename, "w");
+  if (fout == NULL) {
+    print_error(outputFilename, RUNTIME_ERROR);
+    deinit_str(&substr);
+    deinit_str(&str);
+    return 4;
+  }
+  error const findStatus = find_substr(substr, str, fout);
+  if (findStatus == OK)
+    fprintf(fout, "\n");
+  else
+    print_error(outputFilename, findStatus);
+
+  deinit_str(&substr);
+  deinit_str(&str);
   fclose(fout);
   free(substr.body);
   free(str.body);

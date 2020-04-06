@@ -32,6 +32,17 @@ void deinit_str(String *str) {
   free(str->body);
 }
 
+error add_symbol(char const symbol, String *string) {
+  if (string == NULL)
+    return NULL_POINTER;
+  if (string->length == string->capacity)
+    return LENGTH_ERROR;
+
+  string->body[string->length] = symbol;
+  ++string->length;
+  return OK;
+}
+
 error ask_string(FILE* fin, String *out, unsigned int const maxLen) {
   if (fin == NULL || out == NULL)
     return NULL_POINTER;
@@ -42,7 +53,7 @@ error ask_string(FILE* fin, String *out, unsigned int const maxLen) {
   if (initStatus != OK)
     return initStatus;
 
-  for (; out->length < out->capacity; ++out->length) {
+  while (out->length < out->capacity) {
     char symbol;
     int const statusRead = fscanf(fin, "%c", &symbol);
     if (statusRead == EOF || symbol == '\n' || symbol == '\r')
@@ -53,12 +64,44 @@ error ask_string(FILE* fin, String *out, unsigned int const maxLen) {
       return RUNTIME_ERROR;
     }
 
-    out->body[out->length] = symbol;
+    error const statusAdd = add_symbol(symbol, out);
+    if (statusAdd != OK)
+      return statusAdd;
   }
 
   deinit_str(out);
-  return BAD_INPUT;
+  return LENGTH_ERROR;
  }
+
+ error ask_text(FILE* fin, String *out, unsigned int const maxLen) {
+   if (fin == NULL || out == NULL)
+     return NULL_POINTER;
+   if (maxLen == 0)
+     return LENGTH_ERROR;
+
+   error const initStatus = init_str(out, maxLen);
+   if (initStatus != OK)
+     return initStatus;
+
+   while (out->length < out->capacity) {
+     char symbol;
+     int const statusRead = fscanf(fin, "%c", &symbol);
+     if (statusRead == EOF)
+       return OK;
+
+     if (statusRead == 0) {
+       deinit_str(out);
+       return RUNTIME_ERROR;
+     }
+
+     error const statusAdd = add_symbol(symbol, out);
+     if (statusAdd != OK)
+       return statusAdd;
+   }
+
+   deinit_str(out);
+   return LENGTH_ERROR;
+  }
 
 error print_string(FILE* fout, String const str) {
   if (fout == NULL)

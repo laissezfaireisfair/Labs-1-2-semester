@@ -15,6 +15,10 @@ error init_str(String *str, unsigned int capReq);
 
 void deinit_str(String *str);
 
+error add_symbol(char const symbol, String *string);
+
 error ask_string(FILE* fin, String *out, unsigned int const maxLen);
+
+error ask_text(FILE* fin, String *out, unsigned int const maxLen);
 
 error print_string(FILE* fout, String const seq);
