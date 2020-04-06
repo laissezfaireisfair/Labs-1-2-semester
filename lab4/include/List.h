@@ -1,8 +1,10 @@
 #pragma once
 #include <stdlib.h>
 
+typedef char valType;
+
 typedef struct _ListElem {
-  unsigned int value;
+  valType value;
   struct _ListElem *next;
 } ListElem;
 
@@ -12,7 +14,7 @@ typedef struct _List {
 
 List make_list();
 
-void push_front(List *list, unsigned int const value);
+void push_front(List *list, valType const value);
 
 unsigned int pop_back(List *list);
 
