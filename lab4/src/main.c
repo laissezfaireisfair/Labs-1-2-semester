@@ -5,9 +5,20 @@
 
 error parse_expression(String const expr, List * nums, List * operations);
 
-error count_parsed(List * nums, List * operations);
+error count_parsed(List nums, List operations);
 
-error count_expression(String const expr, long int & answer);
+error count_expression(String const expr, long int & answer) {
+  List nums = make_list(), operations = make_list();
+
+  error const parseStatus = parse_expression(expr, &nums, &operations);
+  if (parseStatus != OK)
+    return parseStatus;
+
+  error const countStatus = count_expression(nums, operations);
+  delete_list(nums);
+  delete_list(operations);
+  return countStatus;
+}
 
 int main() {
   char const * const inputFilename  = "input.txt";
