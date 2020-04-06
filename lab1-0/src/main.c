@@ -3,15 +3,15 @@
 #include "Errors.h"
 #include "String.h"
 
-error find_substr(String const substr, String const str, FILE* fout) {
+error find_substr(String const substr, String const str, unsigned int const maxStrLen, FILE* fout) {
   if (fout == NULL)
     return NULL_POINTER;
   if (substr.length == 0 || str.length == 0)
     return INVALID_ARGUMENT;
 
   // Distance from begin to first symbol position:
-  int *stopTable = (int*)malloc(sizeof(int) * substr.length);
-  for (unsigned int i = 0; i < substr.length; ++i)
+  int *stopTable = (int*)malloc(sizeof(int) * maxStrLen);
+  for (unsigned int i = 0; i < maxStrLen; ++i)
     stopTable[i] = -1;
   for (unsigned int i = 0; i < substr.length; ++i)
     stopTable[substr.body[substr.length - i - 1]] = substr.length - i - 1;
@@ -73,7 +73,7 @@ int main(void) {
     deinit_str(&str);
     return 4;
   }
-  error const findStatus = find_substr(substr, str, fout);
+  error const findStatus = find_substr(substr, str, maxStrLen, fout);
   if (findStatus == OK)
     fprintf(fout, "\n");
   else
