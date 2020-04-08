@@ -4,6 +4,7 @@
 #include "String.h"
 #include "Stack.h"
 
+// Comparsion of "bool" variables
 int is_bool_equal(int const num1, int const num2) {
   if ((num1 == 0 && num2 == 0) || (num1 != 0 && num2 != 0))
     return 1;
@@ -28,13 +29,39 @@ error apply_operation(int const num1, int const num2, char const sign, int *answ
   }
 }
 
-error parse_expression(String const expr, Stack * nums, Stack * operations);
+int type_of_symbol(char const symbol) {
+  if (symbol >= '0' && symbol <= '9')
+    return 1;
+  if (symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/')
+    return 2;
+  if (symbol == '(')
+    return 3;
+  if (symbol == ')')
+    return 4;
+  return 0;
+}
+
+error parse_expression(String const expr, Stack * nums, Stack * operations) {
+  if (nums == NULL || operations == NULL)
+    return NULL_POINTER;
+  if (expr.body == NULL)
+    return INVALID_ARGUMENT;
+
+  for (unsigned int i = 0; i < expr.length; ++i) {
+    char const symbol = expr.body[i];
+    int const type = type_of_symbol(symbol);
+    // TODO: Handle symbol
+  }
+
+  return OK;
+}
 
 error count_parsed(Stack nums, Stack operations, int *answ) {
   if (answ == NULL)
     return NULL_POINTER;
   if (is_stack_empty(nums) || is_stack_empty(operations))
     return INVALID_ARGUMENT;
+
   for (*answ = pop(&nums); !is_stack_empty(nums) && !is_stack_empty(operations);) {
     int const num2 = pop(&nums);
     char const sign = (char)(pop(&operations));
