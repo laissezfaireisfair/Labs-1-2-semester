@@ -6,11 +6,11 @@ Stack make_stack() {
   return stack;
 }
 
-void push(Stack *stack, valT const value) {
+void push(Stack *stack, valType const value) {
   push_front(&stack->body, value);
 }
 
-valT pop(Stack *stack) {
+valType pop(Stack *stack) {
   return pop_front(&stack->body);
 }
 

@@ -2,17 +2,15 @@
 #include <stdlib.h>
 #include "List.h"
 
-typedef unsigned int valT;
-
 typedef struct _Stack {
   List body;
 } Stack;
 
 Stack make_stack();
 
-void push(Stack *stack, valT const value);
+void push(Stack *stack, valType const value);
 
-valT pop(Stack *stack);
+valType pop(Stack *stack);
 
 void delete_stack(Stack *stack);
 
