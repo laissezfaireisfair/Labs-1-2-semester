@@ -34,6 +34,16 @@ valType pop_back(List *list) {
   return lastValue;
 }
 
+valType pop_front(List *list) {
+  assert(list->head != NULL);
+
+  valType const lastValue = list->head->value;
+  ListElem *newHead = list->head->next;
+  free(list->head);
+  list->head = newHead;
+  return lastValue;
+}
+
 void delete_list(List *list) {
   for (ListElem *i = list->head; i != NULL;) {
     ListElem *next = i->next;
