@@ -8,9 +8,9 @@ typedef struct _Stack {
 
 Stack make_stack();
 
-void push(Stack *stack, valType const value);
+void push_to_stack(Stack *stack, valType const value);
 
-valType pop(Stack *stack);
+valType pop_from_stack(Stack *stack);
 
 void delete_stack(Stack *stack);
 
