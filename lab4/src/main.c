@@ -168,7 +168,7 @@ error count_expression(String const expr, int *answ) {
     return NULL_POINTER;
 
   String parsedExpr = make_str();
-  unsigned int const maxstrlen = 256;
+  unsigned int const maxstrlen = 1000;
   error initStatus = init_str(&parsedExpr, maxstrlen);
   if (initStatus != OK)
     return initStatus;
