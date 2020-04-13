@@ -161,10 +161,14 @@ error count_parsed(String const expr, int *answ) {
     }
 
     if (symbol == ' ') {
-      push_to_stack(&stack, numNow);
-      numNow = 0;
+      if (type_of_symbol(expr.body[i - 1]) == DIGIT) {
+        push_to_stack(&stack, numNow);
+        numNow = 0;
+      }
       continue;
     }
+
+    // Case when symbol is operation:
     int num1 = pop_from_stack(&stack), num2 = pop_from_stack(&stack);
     int operationResult;
     error const operationStatus = apply_operation(num1, num2, symbol, &operationResult);
