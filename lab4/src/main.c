@@ -142,11 +142,22 @@ error count_parsed(String const expr, int *answ) {
     SymbType const type = type_of_symbol(symbol);
     if (type == C_BRACKET || symbol == '(' || type == UNSUPPORTED)
       return RUNTIME_ERROR;
+
     if (type == DIGIT) {
       add_digit(symbol, &numNow);
+    } else {
+      if (type_of_symbol(expr.body[i-1]) == DIGIT) { // Number input just ended
+        push_to_stack(&stack, numNow);
+        numNow = 0;
+      }
+      int num1 = pop_from_stack(&stack), num2 = pop_from_stack(&stack);
+      int operationResult;
+      error const operationStatus = apply_operation(num1, num2, symbol, &operationResult);
+      push_to_stack(&stack, operationResult);
     }
   }
-
+  answ = front(stack);
+  delete_stack(&stack);
   return OK;
 }
 
