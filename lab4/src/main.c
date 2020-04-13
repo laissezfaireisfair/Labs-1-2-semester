@@ -59,7 +59,7 @@ error add_digit(char const digit, int *number) {
   if (*number > INT_MAX / 10 - 9)
     return INVALID_ARGUMENT;
   *number *= 10;
-  number += digit - '0';
+  *number += digit - '0';
   return OK;
 }
 
