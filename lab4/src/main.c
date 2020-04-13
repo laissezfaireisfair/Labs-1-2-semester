@@ -161,7 +161,7 @@ error count_parsed(String const expr, int *answ) {
     }
 
     if (symbol == ' ') {
-      if (type_of_symbol(expr.body[i - 1]) == DIGIT) {
+      if (i != 0 && type_of_symbol(expr.body[i - 1]) == DIGIT) {
         push_to_stack(&stack, numNow);
         numNow = 0;
       }
