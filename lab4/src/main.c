@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <limits.h>
 #include "Errors.h"
 #include "String.h"
 #include "Stack.h"
@@ -29,51 +30,65 @@ error apply_operation(int const num1, int const num2, char const sign, int *answ
   }
 }
 
-int type_of_symbol(char const symbol) {
+typedef enum _SymbType {UNSUPPORTED, DIGIT, PRIORITY_1_OPERATION,
+  PRIORITY_2_OPERATION, C_BRACKET} SymbType;
+
+SymbType type_of_symbol(char const symbol) {
   if (symbol >= '0' && symbol <= '9')
-    return 1;
-  if (symbol == '+' || symbol == '-' || symbol == '*' || symbol == '/')
-    return 2;
+    return DIGIT;
   if (symbol == '(')
-    return 3;
+    return PRIORITY_1_OPERATION;
+  if (symbol == '+' || symbol == '-')
+    return PRIORITY_2_OPERATION;
+  if (symbol == '*' || symbol == '/' || )
+    return PRIORITY_3_OPERATION;
   if (symbol == ')')
-    return 4;
-  return 0;
+    return C_BRACKET;
+  return UNSUPPORTED;
 }
 
-error parse_expression(String const expr, Stack * nums, Stack * operations) {
-  if (nums == NULL || operations == NULL)
+error add_digit(char const digit, int *number) {
+  if (number == NULL)
+    return NULL_POINTER;
+  if (*number > INT_MAX / 10 - 9)
+    return INVALID_ARGUMENT;
+  *number *= 10;
+  number += digit - '0';
+  return OK;
+}
+
+// Turns expression to back poland notation
+error parse_expression(String const expr, String * parsed) {
+  if (parsed == NULL)
     return NULL_POINTER;
   if (expr.body == NULL)
     return INVALID_ARGUMENT;
 
+  int numberNow = 0;
+  Stack stack = make_stack();
   for (unsigned int i = 0; i < expr.length; ++i) {
     char const symbol = expr.body[i];
-    int const type = type_of_symbol(symbol);
-    // TODO: Handle symbol
+    if (type_of_symbol(symbol) == DIGIT) {
+      add_digit(digit, &numberNow);
+      continue;
+    }
+    if (numberNow != 0) { // Case when number input just ended
+      if (parsed.capacity == parsed.length)
+        return LENGTH_ERROR;
+      
+    }
   }
 
   return OK;
 }
 
-error count_parsed(Stack nums, Stack operations, int *answ) {
+// Requires back poland notation as expression
+error count_parsed(String const expr, int *answ) {
   if (answ == NULL)
-    return NULL_POINTER;
-  if (is_stack_empty(nums) || is_stack_empty(operations))
+  return NULL_POINTER;
+  if (expr.length == 0)
     return INVALID_ARGUMENT;
-
-  for (*answ = pop(&nums); !is_stack_empty(nums) && !is_stack_empty(operations);) {
-    int const num2 = pop(&nums);
-    char const sign = (char)(pop(&operations));
-    error const statusCounting = apply_operation(*answ, num2, sign, answ);
-    if (statusCounting != OK)
-      return statusCounting;
-  }
-
-  // Check if one of stacks still have elements:
-  if (!is_bool_equal(is_stack_empty(nums), is_stack_empty(operations)))
-    return INVALID_ARGUMENT;
-
+  // TODO:
   return OK;
 }
 
@@ -81,15 +96,14 @@ error count_expression(String const expr, int *answ) {
   if (answ == NULL)
     return NULL_POINTER;
 
-  Stack nums = make_stack(), operations = make_stack();
+  String parsedExpr = make_str();
 
-  error const parseStatus = parse_expression(expr, &nums, &operations);
+  error const parseStatus = parse_expression(expr, &parsedExpr);
   if (parseStatus != OK)
     return parseStatus;
 
-  error const countStatus = count_parsed(nums, operations, answ);
-  delete_stack(&nums);
-  delete_stack(&operations);
+  error const countStatus = count_parsed(parsedExpr, answ);
+  deinit_str(&parsedExpr);
   return countStatus;
 }
 
