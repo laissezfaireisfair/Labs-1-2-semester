@@ -134,7 +134,19 @@ error count_parsed(String const expr, int *answ) {
   return NULL_POINTER;
   if (expr.length == 0)
     return INVALID_ARGUMENT;
-  // TODO:
+
+  Stack stack = make_stack();
+  int numNow = 0;
+  for (unsigned int i = 0; i < expr.length; ++i) {
+    char const symbol = expr.body[i];
+    SymbType const type = type_of_symbol(symbol);
+    if (type == C_BRACKET || symbol == '(' || type == UNSUPPORTED)
+      return RUNTIME_ERROR;
+    if (type == DIGIT) {
+      add_digit(symbol, &numNow);
+    }
+  }
+
   return OK;
 }
 
