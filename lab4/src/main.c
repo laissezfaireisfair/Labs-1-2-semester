@@ -70,13 +70,12 @@ error parse_expression(String const expr, String * parsed) {
   if (expr.body == NULL)
     return INVALID_ARGUMENT;
 
-  int numberNow = 0;
   Stack stack = make_stack();
   for (unsigned int i = 0; i < expr.length;) {
     char const symbol = expr.body[i];
     switch (type_of_symbol(symbol)) {
       // Add digit to result and go next:
-      case DIGIT {
+      case DIGIT: {
         error const addStatus = add_symbol(symbol, parsed);
         if (addStatus != OK)
           return addStatus;
@@ -85,9 +84,9 @@ error parse_expression(String const expr, String * parsed) {
       }
 
       // Add operation to stack and go next, or move last operation to result:
-      case OPERATION {
+      case OPERATION: {
         int const priority = get_priority(symbol);
-        if (is_stack_empty() || priority > get_priority(front(&stack))) {
+        if (is_stack_empty(stack) || priority > get_priority(front(&stack))) {
           push_to_stack(&stack, symbol);
           ++i;
           break;
@@ -99,7 +98,7 @@ error parse_expression(String const expr, String * parsed) {
       }
 
       // Add operations between brackets and go next:
-      case C_BRACKET {
+      case C_BRACKET: {
         if (is_stack_empty(stack)) // Bad brackets
           return BAD_INPUT;
         char const lastOperation = pop_from_stack(&stack);

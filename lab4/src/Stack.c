@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "Stack.h"
 
 Stack make_stack() {
@@ -25,6 +26,6 @@ int is_stack_empty(Stack const stack) {
 }
 
 valType front(Stack *this) {
-  assert(this->body->head != NULL);
-  return this->body->head->value;
+  assert(this->body.head != NULL);
+  return this->body.head->value;
 }
