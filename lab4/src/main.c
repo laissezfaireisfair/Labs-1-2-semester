@@ -96,9 +96,6 @@ error parse_expression(String const expr, String * parsed) {
           break;
         }
         char const lastOperation = pop_from_stack(&stack);
-        error const space2Status = add_symbol(' ', parsed);
-        if (space2Status != OK)
-          return space2Status;
         error const addStatus = add_symbol(lastOperation, parsed);
         if (addStatus != OK)
           return addStatus;
