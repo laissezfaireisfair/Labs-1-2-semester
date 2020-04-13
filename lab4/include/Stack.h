@@ -15,3 +15,5 @@ valType pop_from_stack(Stack *stack);
 void delete_stack(Stack *stack);
 
 int is_stack_empty(Stack const stack);
+
+valType front(Stack *this);
