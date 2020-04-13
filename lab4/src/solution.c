@@ -171,7 +171,7 @@ error count_parsed(String const expr, int *answ) {
     // Case when symbol is operation:
     int num1 = pop_from_stack(&stack), num2 = pop_from_stack(&stack);
     int operationResult;
-    error const operationStatus = apply_operation(num1, num2, symbol, &operationResult);
+    error const operationStatus = apply_operation(num2, num1, symbol, &operationResult);
     if (operationStatus != OK)
       return operationStatus;
     push_to_stack(&stack, operationResult);
