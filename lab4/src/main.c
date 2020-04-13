@@ -85,6 +85,10 @@ error parse_expression(String const expr, String * parsed) {
 
       // Add operation to stack and go next, or move last operation to result:
       case OPERATION: {
+        error const spaceStatus = add_symbol(' ', parsed);
+        if (spaceStatus != OK)
+          return spaceStatus;
+
         int const priority = get_priority(symbol);
         if (is_stack_empty(stack) || priority > get_priority(front(stack))) {
           push_to_stack(&stack, symbol);
@@ -92,6 +96,9 @@ error parse_expression(String const expr, String * parsed) {
           break;
         }
         char const lastOperation = pop_from_stack(&stack);
+        error const space2Status = add_symbol(' ', parsed);
+        if (space2Status != OK)
+          return space2Status;
         error const addStatus = add_symbol(lastOperation, parsed);
         if (addStatus != OK)
           return addStatus;
@@ -106,6 +113,9 @@ error parse_expression(String const expr, String * parsed) {
           ++i;
           break;
         }
+        error const spaceStatus = add_symbol(' ', parsed);
+        if (spaceStatus != OK)
+          return spaceStatus;
         error const addStatus = add_symbol(lastOperation, parsed);
         if (addStatus != OK)
           return addStatus;
@@ -120,6 +130,9 @@ error parse_expression(String const expr, String * parsed) {
     char const lastOperation = pop_from_stack(&stack);
     if (lastOperation == '(') // Bad brackets
       return BAD_INPUT;
+    error const spaceStatus = add_symbol(' ', parsed);
+    if (spaceStatus != OK)
+      return spaceStatus;
     error const addStatus = add_symbol(lastOperation, parsed);
     if (addStatus != OK)
       return addStatus;
@@ -140,23 +153,25 @@ error count_parsed(String const expr, int *answ) {
   for (unsigned int i = 0; i < expr.length; ++i) {
     char const symbol = expr.body[i];
     SymbType const type = type_of_symbol(symbol);
-    if (type == C_BRACKET || symbol == '(' || type == UNSUPPORTED)
+    if (type == C_BRACKET || symbol == '(')
       return RUNTIME_ERROR;
 
     if (type == DIGIT) {
       add_digit(symbol, &numNow);
-    } else {
-      if (type_of_symbol(expr.body[i-1]) == DIGIT) { // Number input just ended
-        push_to_stack(&stack, numNow);
-        numNow = 0;
-      }
-      int num1 = pop_from_stack(&stack), num2 = pop_from_stack(&stack);
-      int operationResult;
-      error const operationStatus = apply_operation(num1, num2, symbol, &operationResult);
-      if (operationStatus != OK)
-        return operationStatus;
-      push_to_stack(&stack, operationResult);
+      continue;
     }
+
+    if (symbol == ' ') {
+      push_to_stack(&stack, numNow);
+      numNow = 0;
+      continue;
+    }
+    int num1 = pop_from_stack(&stack), num2 = pop_from_stack(&stack);
+    int operationResult;
+    error const operationStatus = apply_operation(num1, num2, symbol, &operationResult);
+    if (operationStatus != OK)
+      return operationStatus;
+    push_to_stack(&stack, operationResult);
   }
   *answ = front(stack);
   delete_stack(&stack);
