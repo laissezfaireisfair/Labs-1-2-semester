@@ -102,6 +102,7 @@ error parse_expression(String const expr, String * parsed) {
         error const addStatus = add_symbol(lastOperation, parsed);
         if (addStatus != OK)
           return addStatus;
+        break;
       }
 
       // Add operations between brackets and go next:
@@ -119,6 +120,7 @@ error parse_expression(String const expr, String * parsed) {
         error const addStatus = add_symbol(lastOperation, parsed);
         if (addStatus != OK)
           return addStatus;
+        break;
       }
 
       case UNSUPPORTED: return BAD_INPUT;
