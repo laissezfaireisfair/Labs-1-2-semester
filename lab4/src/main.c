@@ -30,21 +30,27 @@ error apply_operation(int const num1, int const num2, char const sign, int *answ
   }
 }
 
-typedef enum _SymbType {UNSUPPORTED, DIGIT, PRIORITY_1_OPERATION,
-  PRIORITY_2_OPERATION, C_BRACKET} SymbType;
+typedef enum _SymbType {UNSUPPORTED, DIGIT, OPERATION, C_BRACKET} SymbType;
 
 SymbType type_of_symbol(char const symbol) {
   if (symbol >= '0' && symbol <= '9')
     return DIGIT;
-  if (symbol == '(')
-    return PRIORITY_1_OPERATION;
-  if (symbol == '+' || symbol == '-')
-    return PRIORITY_2_OPERATION;
-  if (symbol == '*' || symbol == '/' || )
-    return PRIORITY_3_OPERATION;
+  if (symbol == '*' || symbol == '/' || symbol == '(' || symbol == '+' || symbol == '-')
+    return OPERATION;
   if (symbol == ')')
     return C_BRACKET;
   return UNSUPPORTED;
+}
+
+int get_priority(char const operation) {
+  switch (operation) {
+    case '(': return 1;
+    case '+': return 2;
+    case '-': return 2;
+    case '*': return 3;
+    case '/': return 3;
+    default: return -1;
+  }
 }
 
 error add_digit(char const digit, int *number) {
@@ -66,17 +72,58 @@ error parse_expression(String const expr, String * parsed) {
 
   int numberNow = 0;
   Stack stack = make_stack();
-  for (unsigned int i = 0; i < expr.length; ++i) {
+  for (unsigned int i = 0; i < expr.length;) {
     char const symbol = expr.body[i];
-    if (type_of_symbol(symbol) == DIGIT) {
-      add_digit(digit, &numberNow);
-      continue;
+    switch (type_of_symbol(symbol)) {
+      // Add digit to result and go next:
+      case DIGIT {
+        error const addStatus = add_symbol(symbol, parsed);
+        if (addStatus != OK)
+          return addStatus;
+        ++i;
+        break;
+      }
+
+      // Add operation to stack and go next, or move last operation to result:
+      case OPERATION {
+        int const priority = get_priority(symbol);
+        if (is_stack_empty() || priority > get_priority(front(&stack))) {
+          push_to_stack(&stack, symbol);
+          ++i;
+          break;
+        }
+        char const lastOperation = pop_from_stack(&stack);
+        error const addStatus = add_symbol(lastOperation, parsed);
+        if (addStatus != OK)
+          return addStatus;
+      }
+
+      // Add operations between brackets and go next:
+      case C_BRACKET {
+        if (is_stack_empty(stack)) // Bad brackets
+          return BAD_INPUT;
+        char const lastOperation = pop_from_stack(&stack);
+        if (lastOperation == '(') {
+          ++i;
+          break;
+        }
+        error const addStatus = add_symbol(lastOperation, parsed);
+        if (addStatus != OK)
+          return addStatus;
+      }
+
+      case UNSUPPORTED: return BAD_INPUT;
     }
-    if (numberNow != 0) { // Case when number input just ended
-      if (parsed.capacity == parsed.length)
-        return LENGTH_ERROR;
-      
-    }
+  }
+
+  // Add last operations:
+  while (!is_stack_empty(stack)) {
+    char const lastOperation = pop_from_stack(&stack);
+    if (lastOperation == '(') // Bad brackets
+      return BAD_INPUT;
+    error const addStatus = add_symbol(lastOperation, parsed);
+    if (addStatus != OK)
+      return addStatus;
   }
 
   return OK;
