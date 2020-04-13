@@ -86,7 +86,7 @@ error parse_expression(String const expr, String * parsed) {
       // Add operation to stack and go next, or move last operation to result:
       case OPERATION: {
         int const priority = get_priority(symbol);
-        if (is_stack_empty(stack) || priority > get_priority(front(&stack))) {
+        if (is_stack_empty(stack) || priority > get_priority(front(stack))) {
           push_to_stack(&stack, symbol);
           ++i;
           break;
@@ -153,10 +153,12 @@ error count_parsed(String const expr, int *answ) {
       int num1 = pop_from_stack(&stack), num2 = pop_from_stack(&stack);
       int operationResult;
       error const operationStatus = apply_operation(num1, num2, symbol, &operationResult);
+      if (operationStatus != OK)
+        return operationStatus;
       push_to_stack(&stack, operationResult);
     }
   }
-  answ = front(stack);
+  *answ = front(stack);
   delete_stack(&stack);
   return OK;
 }

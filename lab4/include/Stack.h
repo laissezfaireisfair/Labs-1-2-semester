@@ -16,4 +16,4 @@ void delete_stack(Stack *stack);
 
 int is_stack_empty(Stack const stack);
 
-valType front(Stack *this);
+valType front(Stack this);

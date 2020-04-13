@@ -25,7 +25,7 @@ int is_stack_empty(Stack const stack) {
   return 0;
 }
 
-valType front(Stack *this) {
-  assert(this->body.head != NULL);
-  return this->body.head->value;
+valType front(Stack this) {
+  assert(this.body.head != NULL);
+  return this.body.head->value;
 }
