@@ -201,8 +201,8 @@ error count_expression(String const expr, int *answ) {
 }
 
 int main() {
-  char const * const inputFilename  = "input.txt";
-  char const * const outputFilename = "output.txt";
+  char const * const inputFilename  = "in.txt";
+  char const * const outputFilename = "out.txt";
   unsigned int const maxInputSize   = 1000;
 
   FILE *fin = fopen(inputFilename, "r");
