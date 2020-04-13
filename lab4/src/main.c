@@ -168,6 +168,10 @@ error count_expression(String const expr, int *answ) {
     return NULL_POINTER;
 
   String parsedExpr = make_str();
+  unsigned int const maxstrlen = 256;
+  error initStatus = init_str(&parsedExpr, maxstrlen);
+  if (initStatus != OK)
+    return initStatus;
 
   error const parseStatus = parse_expression(expr, &parsedExpr);
   if (parseStatus != OK)
